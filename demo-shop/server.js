@@ -1,4 +1,4 @@
-// Tiny demo shop used in the early Kane measurements (see docs/kane-findings.md) to show a a hidden failure.
+// Tiny demo shop used in the early Kane measurements (see docs/kane-findings.md) to show a hidden failure.
 // Zero dependencies. Run: node demo-shop/server.js   (BUG=0 turns the bug off)
 //
 // The bug (BUG=1, the default): placing an order with a coupon makes the API
