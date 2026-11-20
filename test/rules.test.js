@@ -2,7 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert");
 const { evaluate, parseMoney, parsePromiseThreshold } = require("../lib/rules");
 
-const ok = { status: "passed", stepCount: 12 };
+const ok = { status: "passed", stepCount: 12, values: { checkout_stage: "payment" } };
 
 test("parseMoney reads dollars, thousands and Free", () => {
   assert.equal(parseMoney("$55.00"), 5500);
@@ -21,12 +21,12 @@ test("parsePromiseThreshold reads common wordings and refuses others", () => {
 });
 
 test("a store that keeps its promise passes", () => {
-  const r = evaluate({ ...ok, values: { shipping_promise: "Free shipping on orders over $50", item_price: "$55.00", cart_subtotal: "$55.00", shipping_line: "Free" } });
+  const r = evaluate({ ...ok, values: { checkout_stage: "payment", shipping_promise: "Free shipping on orders over $50", item_price: "$55.00", cart_subtotal: "$55.00", shipping_line: "Free" } });
   assert.equal(r.verdict, "pass");
 });
 
 test("the planted shipping bug fails with the numbers in the message", () => {
-  const r = evaluate({ ...ok, values: { shipping_promise: "Free shipping on orders over $50", item_price: "$55.00", cart_subtotal: "$55.00", shipping_line: "$4.99" } });
+  const r = evaluate({ ...ok, values: { checkout_stage: "payment", shipping_promise: "Free shipping on orders over $50", item_price: "$55.00", cart_subtotal: "$55.00", shipping_line: "$4.99" } });
   assert.equal(r.verdict, "fail");
   const c = r.checks.find((x) => x.id === "shipping_promise");
   assert.equal(c.status, "fail");
@@ -34,13 +34,13 @@ test("the planted shipping bug fails with the numbers in the message", () => {
 });
 
 test("a cart below the threshold does not trigger the promise", () => {
-  const r = evaluate({ ...ok, values: { shipping_promise: "Free shipping on orders over $50", item_price: "$12.00", cart_subtotal: "$12.00", shipping_line: "$4.99" } });
+  const r = evaluate({ ...ok, values: { checkout_stage: "payment", shipping_promise: "Free shipping on orders over $50", item_price: "$12.00", cart_subtotal: "$12.00", shipping_line: "$4.99" } });
   assert.equal(r.checks.find((x) => x.id === "shipping_promise").status, "na");
   assert.equal(r.verdict, "pass");
 });
 
 test("a subtotal that disagrees with the price fails", () => {
-  const r = evaluate({ ...ok, values: { shipping_promise: "x", item_price: "$20.00", cart_subtotal: "$22.00", shipping_line: "Free" } });
+  const r = evaluate({ ...ok, values: { checkout_stage: "payment", shipping_promise: "x", item_price: "$20.00", cart_subtotal: "$22.00", shipping_line: "Free" } });
   assert.equal(r.checks.find((x) => x.id === "price_math").status, "fail");
 });
 
@@ -49,7 +49,7 @@ test("missing values are unknown, never a quiet pass", () => {
   assert.equal(r.verdict, "inconclusive");
 });
 
-test("a Kane failure is a failed reached_payment check", () => {
+test("a Kane failure is a failed reached_checkout check", () => {
   const r = evaluate({ status: "failed", summary: "POST /api/cart -> 500", stepCount: 14, values: {} });
   assert.equal(r.verdict, "fail");
   assert.equal(r.checks[0].status, "fail");
@@ -58,4 +58,22 @@ test("a Kane failure is a failed reached_payment check", () => {
 test("too many steps fails the budget", () => {
   const r = evaluate({ ...ok, stepCount: 31, values: {} }, { stepBudget: 20 });
   assert.equal(r.checks.find((x) => x.id === "step_budget").status, "fail");
+});
+
+test("a checkout that asks for contact details first still counts as reached, and says payment was not probed", () => {
+  const r = evaluate({ status: "passed", stepCount: 8, values: { checkout_stage: "contact", item_price: "$300.00", cart_subtotal: "$300.00", shipping_promise: "Free shipping on orders over $75.00", shipping_line: "Free" } });
+  const c = r.checks.find((x) => x.id === "reached_checkout");
+  assert.equal(c.status, "pass");
+  assert.match(c.detail, /payment itself was not probed/);
+  assert.equal(r.verdict, "pass");
+});
+
+test("pressing Checkout and landing somewhere else fails", () => {
+  const r = evaluate({ status: "passed", stepCount: 8, values: { checkout_stage: "other" } });
+  assert.equal(r.checks.find((x) => x.id === "reached_checkout").status, "fail");
+});
+
+test("a run that never says what Checkout led to is unknown, not a pass", () => {
+  const r = evaluate({ status: "passed", stepCount: 8, values: {} });
+  assert.equal(r.checks.find((x) => x.id === "reached_checkout").status, "unknown");
 });
