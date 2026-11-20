@@ -23,7 +23,7 @@ cartwalk help                    show this text
 
 exit codes for check and loop: 0 pass, 1 fail, 2 inconclusive or could not run
 
-options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 300>
+options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 420>
          --steps <max Kane steps, default 30>  --rounds <n, default 3>`;
 
 function parseArgs(argv) {
@@ -55,9 +55,12 @@ async function walk(url, o, logFile, round) {
   log.append(logFile, "walk_start", { round, url, objective: SHOPPER_OBJECTIVE });
   let run;
   for (let attempt = 1; attempt <= 2; attempt++) {
-    run = await runKane({ url, objective: SHOPPER_OBJECTIVE, timeoutSec: Number(o.timeout || 300), maxSteps: Number(o.steps || 30) });
+    run = await runKane({ url, objective: SHOPPER_OBJECTIVE, timeoutSec: Number(o.timeout || 420), maxSteps: Number(o.steps || 30) });
     log.append(logFile, "kane_run", { round, attempt, status: run.status, reasonCode: run.reasonCode, summary: run.summary, values: run.values, stepCount: run.stepCount, credits: run.credits, durationSec: run.durationSec, testUrl: run.testUrl });
     if (run.status === "passed" || run.status === "failed") break;
+    // Retry a run that died quickly (a crash). Do not retry one that ran out of
+    // time: that would double the wait for a service that is just slow.
+    if (run.reasonCode === "timed_out") { console.log(`  Kane ran out of time after ${run.wallSec}s; not retrying`); break; }
     console.log(`  Kane ended ${run.reasonCode || run.status}; ${attempt === 1 ? "retrying once" : "giving up"}`);
   }
   const verdict = evaluate(run, { stepBudget: Number(o.budget || 20) });

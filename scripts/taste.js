@@ -3,7 +3,7 @@
 // Starts the bundled broken shop, sends one real Kane shopper through it, shows
 // the verdict, and writes an HTML report of the run. The shop is supposed to
 // fail (the Desk Lamp cannot be added to the cart), so a FAIL here is the demo
-// working. It spends Kane credits and takes about 3 to 5 minutes.
+// working. It spends Kane credits and takes usually 3 to 7 minutes.
 const { spawn, spawnSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
@@ -33,7 +33,7 @@ async function isUp() {
   for (let i = 0; i < 40 && !(await isUp()); i++) await new Promise((r) => setTimeout(r, 200));
   if (!(await isUp())) { stop(); console.error("the demo shop did not start"); process.exit(2); }
 
-  console.log(`Demo shop running at ${url} (two planted mistakes). Sending a Kane shopper; this takes 3 to 5 minutes...`);
+  console.log(`Demo shop running at ${url} (two planted mistakes). Sending a Kane shopper; this usually takes 3 to 7 minutes...`);
   const check = spawn(process.execPath, [path.join(root, "bin", "cartwalk.js"), "check", url, "--log", logFile], { stdio: "inherit", cwd: root });
   check.on("close", (code) => {
     stop();
