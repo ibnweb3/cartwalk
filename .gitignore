@@ -9,3 +9,5 @@ runs/
 .codex-pass.md
 .claude-pass.md
 /report.html
+
+!docs/third-party/*-report.html
