@@ -50,7 +50,7 @@ test("missing values are unknown, never a quiet pass", () => {
 });
 
 test("a Kane failure is a failed reached_checkout check", () => {
-  const r = evaluate({ status: "failed", summary: "POST /api/cart -> 500", stepCount: 14, values: {} });
+  const r = evaluate({ status: "failed", reasonCode: "assertion_error.confirmed_product_bug", summary: "POST /api/cart -> 500", stepCount: 14, values: {} });
   assert.equal(r.verdict, "fail");
   assert.equal(r.checks[0].status, "fail");
 });
@@ -76,4 +76,21 @@ test("pressing Checkout and landing somewhere else fails", () => {
 test("a run that never says what Checkout led to is unknown, not a pass", () => {
   const r = evaluate({ status: "passed", stepCount: 8, values: {} });
   assert.equal(r.checks.find((x) => x.id === "reached_checkout").status, "unknown");
+});
+
+test("Kane failing because it could not follow the instruction is unknown, never a store failure", () => {
+  for (const reasonCode of ["assertion_error.step_not_achievable", "assertion_error.final_verification", "stuck.ap_stuck"]) {
+    const r = evaluate({ status: "failed", reasonCode, summary: "The test assumed a banner that is not there.", stepCount: 1, values: {} });
+    const c = r.checks.find((x) => x.id === "reached_checkout");
+    assert.equal(c.status, "unknown", reasonCode);
+    assert.match(c.detail, /not evidence of a store bug/);
+    assert.notEqual(r.verdict, "fail", reasonCode);
+  }
+});
+
+test("a store with no free-shipping promise has nothing to check", () => {
+  const r = evaluate({ status: "passed", stepCount: 7, values: { checkout_stage: "contact", shipping_promise: "none", item_price: "$30.00", cart_subtotal: "$30.00", shipping_line: "$5.00" } });
+  const c = r.checks.find((x) => x.id === "shipping_promise");
+  assert.equal(c.status, "na");
+  assert.equal(r.verdict, "pass");
 });
