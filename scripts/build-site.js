@@ -7,6 +7,7 @@ const path = require("path");
 const { readEntries, verify } = require("../lib/log");
 const { runParts, groupRounds, esc } = require("../lib/report");
 const { BASE } = require("../lib/theme");
+const { SHOPPER_OBJECTIVE } = require("../lib/shopper");
 
 const root = path.join(__dirname, "..");
 const docs = path.join(root, "docs");
@@ -97,6 +98,7 @@ const indexBody = `
     <div class="card"><span class="step">03 · fix</span><h3>A coding agent repairs it</h3><p>Failed checks and Kane's evidence go to Claude Code, which can only read and edit your store's folder. Its diff goes in the log.</p></div>
     <div class="card"><span class="step">04 · prove</span><h3>Kane walks again</h3><p>A fix only counts if the next walk passes. Every walk, verdict and diff is hash-chained: edit or delete one in the middle and verification names the entry.</p></div>
   </div>
+  <div class="card" id="instruction" style="margin-top:12px"><span class="step">the whole instruction Kane receives · lib/shopper.js</span><p class="mono" style="font-size:.9rem;color:var(--fg);margin-top:8px">${esc(SHOPPER_OBJECTIVE)}</p></div>
 </section>
 
 <section class="block" id="run" aria-labelledby="run-h">

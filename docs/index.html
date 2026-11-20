@@ -31,6 +31,7 @@
     <div class="card"><span class="step">03 · fix</span><h3>A coding agent repairs it</h3><p>Failed checks and Kane's evidence go to Claude Code, which can only read and edit your store's folder. Its diff goes in the log.</p></div>
     <div class="card"><span class="step">04 · prove</span><h3>Kane walks again</h3><p>A fix only counts if the next walk passes. Every walk, verdict and diff is hash-chained: edit or delete one in the middle and verification names the entry.</p></div>
   </div>
+  <div class="card" id="instruction" style="margin-top:12px"><span class="step">the whole instruction Kane receives · lib/shopper.js</span><p class="mono" style="font-size:.9rem;color:var(--fg);margin-top:8px">You are a shopper who wants to buy one item. Read the free-shipping promise in the banner at the top of the page and remember it as shipping_promise. Choose the most expensive product, select an option if one is required, and add exactly one to the cart. Open the cart. Remember the item price shown in the cart as item_price, the subtotal as cart_subtotal and the shipping line as shipping_line. Click Checkout. Look at the page it leads to and remember checkout_stage as payment if it asks for card or payment details, contact if it asks for contact, address or shipping details first, or other if it is neither. Do not type into any field on the checkout pages and never pay.</p></div>
 </section>
 
 <section class="block" id="run" aria-labelledby="run-h">
