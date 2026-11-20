@@ -22,8 +22,8 @@ cartwalk help                    show this text
 
 exit codes for check and loop: 0 pass, 1 fail, 2 inconclusive or could not run
 
-options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 180>
-         --steps <max Kane steps, default 25>  --rounds <n, default 3>`;
+options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 300>
+         --steps <max Kane steps, default 30>  --rounds <n, default 3>`;
 
 function parseArgs(argv) {
   const pos = [], opt = {};
@@ -54,7 +54,7 @@ async function walk(url, o, logFile, round) {
   log.append(logFile, "walk_start", { round, url, objective: SHOPPER_OBJECTIVE });
   let run;
   for (let attempt = 1; attempt <= 2; attempt++) {
-    run = await runKane({ url, objective: SHOPPER_OBJECTIVE, timeoutSec: Number(o.timeout || 180), maxSteps: Number(o.steps || 25) });
+    run = await runKane({ url, objective: SHOPPER_OBJECTIVE, timeoutSec: Number(o.timeout || 300), maxSteps: Number(o.steps || 30) });
     log.append(logFile, "kane_run", { round, attempt, status: run.status, reasonCode: run.reasonCode, summary: run.summary, values: run.values, stepCount: run.stepCount, credits: run.credits, durationSec: run.durationSec, testUrl: run.testUrl });
     if (run.status === "passed" || run.status === "failed") break;
     console.log(`  Kane ended ${run.reasonCode || run.status}; ${attempt === 1 ? "retrying once" : "giving up"}`);
