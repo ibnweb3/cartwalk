@@ -1,0 +1,9 @@
+{
+  "name": "notyet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Send a Kane shopper to a store, let plain code judge what it saw, let a coding agent fix it.",
+  "bin": { "cartwalk": "bin/cartwalk.js" },
+  "scripts": { "test": "node --test test/log.test.js test/rules.test.js" },
+  "license": "Apache-2.0"
+}
