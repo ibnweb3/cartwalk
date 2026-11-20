@@ -1,0 +1,27 @@
+diff --git a/store/server.js b/store/server.js
+index 55c6fad..9f659f9 100644
+--- a/store/server.js
++++ b/store/server.js
+@@ -13,12 +13,11 @@ const PORT = Number(process.env.PORT || 4180);
+ 
+ const PRODUCTS = {
+   notebook: { name: "Notebook (A5)", price: 1200 },
+-  // The lamp is missing here on purpose, so adding it to the cart fails.
++  lamp: { name: "Desk Lamp", price: 5500 },
+ };
+-const LAMP = { name: "Desk Lamp", price: 5500 };
+ 
+ const FREE_SHIPPING_BANNER_DOLLARS = 50;
+-const FREE_SHIPPING_OVER_CENTS = 7500;
++const FREE_SHIPPING_OVER_CENTS = FREE_SHIPPING_BANNER_DOLLARS * 100;
+ const SHIPPING_CENTS = 499;
+ 
+ const carts = new Map(); // session id -> [{ slug, qty }]
+@@ -27,7 +26,6 @@ const money = (c) => "$" + (c / 100).toFixed(2);
+ const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+ 
+ function lookup(slug) {
+-  if (slug === "lamp") return LAMP;
+   return PRODUCTS[slug];
+ }
+ 
