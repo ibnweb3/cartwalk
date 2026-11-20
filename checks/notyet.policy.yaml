@@ -1,0 +1,5 @@
+policy: notyet-gate
+gates:
+  - { id: no-failed-tests, metric: totals.failed, equals: 0, severity: blocking }
+  - { id: no-failed-steps, metric: steps.failed, equals: 0, severity: blocking }
+  - { id: every-test-has-checks, metric: metrics.tests_without_checks, equals: 0, severity: blocking }

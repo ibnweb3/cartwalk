@@ -54,6 +54,11 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     return res.end(PAGE);
   }
+  if (req.method === "GET" && req.url === "/favicon.ico") {
+    // Without this the browser logs a 404 console error on every page load.
+    res.writeHead(204);
+    return res.end();
+  }
   if (req.method === "POST" && req.url === "/api/order") {
     let body = "";
     req.on("data", (c) => (body += c));
