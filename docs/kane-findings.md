@@ -28,3 +28,9 @@ Browser: Playwright Chromium (Google Chrome is not installed here; Brave gave th
 
 ## A real catch along the way
 The first "fixed" shop still failed because it returned 404 for `/favicon.ico`, a genuine console error. Fixed in `demo-shop/server.js`.
+
+## Retest with real Google Chrome 158 (2026-11-20)
+Chrome installed, Kane found it without the path override. Same objective as above.
+- Fixed shop (should pass): 0 of 3 passed, all `stuck.ap_stuck`.
+- Buggy shop (should fail): 1 of 2 caught as `confirmed_product_bug`, 1 ended `step_not_achievable` (could not read saved network statuses).
+So the browser build was not the cause of the unreliable green case.
