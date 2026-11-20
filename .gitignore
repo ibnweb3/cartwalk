@@ -5,3 +5,5 @@ node_modules/
 *.log
 runs/
 *.tampered.jsonl
+.codex-pass.md
+.claude-pass.md
