@@ -38,3 +38,15 @@ test("text from the log cannot inject markup, in the page or in the embedded dat
 test("an empty log still renders", () => {
   assert.match(renderReport([]), /Cartwalk report/);
 });
+
+test("the intro block appears only when asked for, and names real commands", () => {
+  const entries = readEntries(sampleLog());
+  assert.ok(!renderReport(entries).includes("Taste it"));
+  const html = renderReport(entries, { intro: { repoUrl: "https://github.com/ibnweb3/cartwalk", logHref: "demo-run/loop.jsonl" } });
+  assert.match(html, /Taste it/);
+  assert.match(html, /npm run offline/);
+  assert.match(html, /npm run taste/);
+  assert.match(html, /href="demo-run\/loop\.jsonl"/);
+  const scripts = require("../package.json").scripts;
+  assert.ok(scripts.offline && scripts.taste, "the commands the page names must exist in package.json");
+});

@@ -15,8 +15,9 @@ const USAGE = `cartwalk check  <url>            run one shopper walk and judge i
 cartwalk loop   <url> --fix-dir <dir> --serve <file.js>
                                  walk, let the coding agent fix, walk again (default 3 rounds)
 cartwalk verify [--log <file>]   check that a log has not been edited
-cartwalk report <log> [--out <file.html>]
+cartwalk report <log> [--out <file.html>] [--intro-repo <url> --intro-log <href>]
                                  write a one-page HTML report with an in-browser verifier
+                                 (the intro options add the "taste it" block used on the hosted copy)
 cartwalk tamper <log>            edit a COPY of the log (a failed check becomes a pass) and show verify catch it
 cartwalk help                    show this text
 
@@ -135,7 +136,9 @@ function verifyCmd(o) {
 function reportCmd(file, o) {
   if (!fs.existsSync(file)) { console.error("no such log: " + file); return 2; }
   const out = o.out || file.replace(/\.jsonl$/, "") + "-report.html";
-  fs.writeFileSync(out, require("../lib/report").reportFromFile(file));
+  // --intro-repo adds the "taste it" block used on the hosted copy of the report.
+  const extra = o["intro-repo"] ? { intro: { repoUrl: o["intro-repo"], logHref: o["intro-log"] } } : {};
+  fs.writeFileSync(out, require("../lib/report").reportFromFile(file, extra));
   console.log("wrote " + out);
   return 0;
 }
