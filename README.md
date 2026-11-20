@@ -28,9 +28,15 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
 Each walk took 2.5 to 4 minutes and 25 to 45 Kane credits; the whole run was about 10 minutes. This is the run made with the current rules and shopper instruction. The agent's fixes differ a little between runs, so the log and the diff go together.
 
-## On a store I did not build
+## On stores I did not build
 
 Saleor's public demo, one walk, `docs/third-party/saleor-demo.jsonl`: PASS in 4 minutes and 53 credits. Kane read the banner ("Free shipping on orders over $75.00"), picked a $300.00 item, and the cart showed $300.00 with free shipping. Checkout asked for contact details first, so the result says payment was not probed. Cartwalk does not fill in contact details, so a rule that demanded the payment page would blame a working store for that limit. An earlier walk, `docs/third-party/saleor-demo-attempt-2.jsonl`, shows it: Kane read the same price, subtotal and free shipping correctly, but the old rule failed "reached payment" at the contact-details step. The rule now counts that step as reached (`lib/rules.js`, covered in `test/rules.test.js`), so the coding agent is not sent to "fix" a working store. A first attempt ran out of time and was reported inconclusive; its log was not kept.
+
+### A catch on Medusa's public demo
+
+`docs/third-party/medusa-demo.jsonl` ([report](docs/third-party/medusa-demo-report.html)): Kane tried to add a pair of headphones to the cart and ended with `confirmed_product_bug`. Its evidence is the request `POST https://next.medusajs.com/dk/products/wireless-over-ear-headphones?v_id=... -> 500` and a matching console error, and the page never added the item. I saw the same 500 in two earlier direct Kane runs on that demo. It may be a problem with that demo's backend and not with Medusa's code, and I have not reported it to them. The run is 10 steps, 268 seconds and 55 credits.
+
+An earlier Cartwalk walk of the same demo taught me something: Medusa has no free-shipping banner, so Kane stopped at step 1 ("step not achievable") and Cartwalk reported a store failure. That was wrong. Kane also ends "failed" when it cannot follow the instruction, which is not evidence of a store bug. Cartwalk now treats only `confirmed_product_bug` as a store failure (every real bug in my logs carried it, both false alarms did not), everything else is "unknown" with Kane's own words, and a missing banner is "none" and "n/a". That earlier log was not kept.
 
 ## Try it
 
@@ -61,7 +67,7 @@ node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html
 
 ## What it does not do
 
-- It has been run on one store I did not build: Saleor's public demo (above), once. One walk is not a benchmark.
+- It has been run on two stores I did not build, once each: Saleor's public demo (a pass) and Medusa's public demo (a confirmed 500 on add to cart). Two walks are not a benchmark.
 - Many real stores ask for contact details before payment. Cartwalk types nothing into checkout, so there it reports that checkout was reached and says payment itself was not probed.
 - The coding agent has no shell, so it cannot run the store itself. Kane's next walk is the only proof a fix worked.
 - It tests one flow (most expensive product, one unit, to checkout). It does not test coupons, logins, guest versus account checkout, or real payment.

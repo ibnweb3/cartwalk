@@ -127,6 +127,16 @@ I left the free-shipping mismatch alone: the banner says $50 but the code only g
 </section></div>
 </section>
 
+<section class="block" id="stores" aria-labelledby="stores-h">
+  <span class="label">/stores-i-did-not-build</span>
+  <h2 id="stores-h">Two stores I did not build</h2>
+  <p class="lede">The same single instruction, no changes per store. One pass, one real catch.</p>
+  <div class="grid3" style="grid-template-columns:repeat(2,1fr)">
+    <div class="card"><span class="step">pass · Saleor public demo</span><h3>Banner, price and shipping read correctly</h3><p>Kane read a $75.00 free-shipping promise and a $300.00 item, the cart agreed, and checkout asked for contact details, so Cartwalk says payment was not probed.</p><p style="margin-top:8px"><a href="third-party/saleor-demo-report.html">Report</a> · <a href="third-party/saleor-demo.jsonl">Log</a></p></div>
+    <div class="card"><span class="step">catch · Medusa public demo</span><h3>Add to cart returned a 500</h3><p>Kane ended with a confirmed product bug: <span class="mono">POST .../wireless-over-ear-headphones -> 500</span> and the page never added the item. It may be that demo's backend, not Medusa's code.</p><p style="margin-top:8px"><a href="third-party/medusa-demo-report.html">Report</a> · <a href="third-party/medusa-demo.jsonl">Log</a></p></div>
+  </div>
+</section>
+
 <section class="block" id="checks" aria-labelledby="checks-h">
   <span class="label">/the-deciding-code</span>
   <h2 id="checks-h">What the code decides</h2>
@@ -153,7 +163,7 @@ npm run offline</code></pre><button type="button" class="copy" aria-label="Copy 
   <span class="label">/limits</span>
   <h2 id="limits-h">What it does not do</h2>
   <div class="card"><ul style="margin:0">
-    <li>It has been run on one third-party store (Saleor's public demo) once, plus the bundled shop. One walk is not a benchmark.</li>
+    <li>It has been run on two third-party public demos, once each: Saleor passed, and on Medusa's demo Kane confirmed a 500 on add to cart (that may be the demo's backend, not Medusa's code). Two walks are not a benchmark.</li>
     <li>Many real stores ask for contact details before payment. Cartwalk types nothing into checkout, so it says checkout was reached and that payment was not probed.</li>
     <li>It tests one flow: the most expensive product, one unit, to checkout. No coupons, logins or real payment.</li>
     <li>The coding agent has no shell, so it cannot run your store. Kane's next walk is the only proof a fix worked.</li>
