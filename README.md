@@ -8,8 +8,8 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
 ## How it works
 
-1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It stops at the payment page and never pays.
-2. **Plain code judges.** Kane reports what it saw (banner text, item price, subtotal, shipping line). `lib/rules.js` decides with arithmetic and comparisons, never with a model's opinion: did it reach payment, in how many steps, does price x quantity equal the subtotal, does the store keep its free-shipping promise.
+1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It looks at what Checkout leads to, types nothing into the checkout pages, and never pays.
+2. **Plain code judges.** Kane reports what it saw (banner text, item price, subtotal, shipping line). `lib/rules.js` decides with arithmetic and comparisons, never with a model's opinion: did it reach checkout, in how many steps, does price x quantity equal the subtotal, does the store keep its free-shipping promise.
 3. **A coding agent fixes it.** Failed checks and Kane's evidence go to Claude Code, which may edit only the store's folder. Its diff is logged.
 4. **Kane walks again.** The agent's fix only counts if the next walk passes.
 5. **Every step is in a hash-chained log.** `cartwalk verify` tells you if anything in the middle was edited or removed.
@@ -25,6 +25,10 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 | 3 | PASS | Reached the payment page, the arithmetic matches, shipping is free. |
 
 Each walk took 2-3 minutes and 29-41 Kane credits.
+
+## On a store I did not build
+
+Saleor's public demo, one walk, `docs/third-party/saleor-demo.jsonl`: PASS in 4 minutes and 53 credits. Kane read the banner ("Free shipping on orders over $75.00"), picked a $300.00 item, and the cart showed $300.00 with free shipping. Checkout asked for contact details first, so the result says payment was not probed. Two earlier attempts taught me something: the first ran out of time at my 180-second limit and was correctly reported as inconclusive, and the second failed "reached payment" only because Cartwalk does not fill in contact details. That was Cartwalk's limit, not a bug in Saleor, so I changed the rule instead of letting the agent "fix" a working store.
 
 ## Try it
 
@@ -48,9 +52,10 @@ node bin/cartwalk.js verify --log docs/demo-run/loop.jsonl
 
 ## What it does not do
 
-- It has not been run against a store I did not build. A public demo storefront I tried (Medusa's) failed before the cart: its add-to-cart returned 500 in two of two runs, which may be a problem with that demo backend.
+- It has been run on one store I did not build that works: Saleor's public demo (below). Another public demo (Medusa's) failed before the cart, with add-to-cart returning 500 in two of two runs; that may be a problem with that demo backend, not Medusa's code.
+- Many real stores ask for contact details before payment. Cartwalk types nothing into checkout, so there it reports that checkout was reached and says payment itself was not probed.
 - The coding agent could not run the store itself in either recorded run. Kane's next walk is the only proof a fix worked.
-- It tests one flow (most expensive product, one unit, to the payment page). It does not test coupons, logins, guest versus account checkout, or real payment.
+- It tests one flow (most expensive product, one unit, to checkout). It does not test coupons, logins, guest versus account checkout, or real payment.
 - The log catches edits and deletions in the middle. It cannot catch entries cut off the end; publish the `head` hash somewhere else to cover that.
 - Kane's runs can be slow or end stuck, and `--timeout` is not always honoured while a page request hangs, so Cartwalk enforces its own hard limit.
 
