@@ -4,6 +4,6 @@
   "private": true,
   "description": "Send a Kane shopper to a store, let plain code judge what it saw, let a coding agent fix it.",
   "bin": { "cartwalk": "bin/cartwalk.js" },
-  "scripts": { "test": "node --test test/log.test.js test/rules.test.js" },
+  "scripts": { "test": "node --test test/log.test.js test/rules.test.js test/fix.test.js" },
   "license": "Apache-2.0"
 }
