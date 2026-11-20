@@ -15,6 +15,9 @@ const USAGE = `cartwalk check  <url>            run one shopper walk and judge i
 cartwalk loop   <url> --fix-dir <dir> --serve <file.js>
                                  walk, let the coding agent fix, walk again (default 3 rounds)
 cartwalk verify [--log <file>]   check that a log has not been edited
+cartwalk report <log> [--out <file.html>]
+                                 write a one-page HTML report with an in-browser verifier
+cartwalk tamper <log>            edit a COPY of the log (a failed check becomes a pass) and show verify catch it
 
 options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 180>
          --steps <max Kane steps, default 25>  --rounds <n, default 3>`;
@@ -117,6 +120,31 @@ function verifyCmd(o) {
   return 1;
 }
 
+function reportCmd(file, o) {
+  if (!fs.existsSync(file)) { console.error("no such log: " + file); return 2; }
+  const out = o.out || file.replace(/\.jsonl$/, "") + "-report.html";
+  fs.writeFileSync(out, require("../lib/report").reportFromFile(file));
+  console.log("wrote " + out);
+  return 0;
+}
+
+// Proves the log is tamper-evident without touching the real one: change a copy, verify it.
+function tamperCmd(file) {
+  if (!fs.existsSync(file)) { console.error("no such log: " + file); return 2; }
+  const entries = log.readEntries(file);
+  const target = entries.find((e) => e.kind === "verdict" && e.data.checks.some((c) => c.status === "fail"));
+  if (!target) { console.error("this log has no failed check to tamper with"); return 2; }
+  const check = target.data.checks.find((c) => c.status === "fail");
+  const copy = file.replace(/\.jsonl$/, "") + ".tampered.jsonl";
+  console.log(`original: ${log.verify(file).ok ? "chain intact" : "BROKEN"}`);
+  console.log(`editing a copy: entry ${target.seq}, check "${check.id}", fail -> pass`);
+  check.status = "pass";
+  fs.writeFileSync(copy, entries.map((e) => JSON.stringify(e)).join("\n") + "\n");
+  const v = log.verify(copy);
+  console.log(`tampered copy (${copy}): ${v.ok ? "chain intact (this should not happen)" : "BROKEN: " + v.reason}`);
+  return v.ok ? 1 : 0;
+}
+
 (async () => {
   const { pos, opt } = parseArgs(process.argv.slice(2));
   const cmd = pos[0];
@@ -124,6 +152,8 @@ function verifyCmd(o) {
     if (cmd === "check" && pos[1]) process.exitCode = await check(pos[1], opt);
     else if (cmd === "loop" && pos[1]) process.exitCode = await loop(pos[1], opt);
     else if (cmd === "verify") process.exitCode = verifyCmd(opt);
+    else if (cmd === "report" && pos[1]) process.exitCode = reportCmd(pos[1], opt);
+    else if (cmd === "tamper" && pos[1]) process.exitCode = tamperCmd(pos[1]);
     else { console.log(USAGE); process.exitCode = cmd ? 2 : 0; }
   } catch (err) { console.error("cartwalk: " + err.message); process.exitCode = 2; }
 })();

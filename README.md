@@ -36,7 +36,7 @@ You need Node 20+, [Kane CLI](https://github.com/LambdaTest/kane-cli) logged in 
 
 ```bash
 git clone https://github.com/ibnweb3/cartwalk && cd cartwalk
-npm test                                   # 16 unit tests, no network
+npm test                                   # unit tests, no network
 
 # walk and judge any store (never pays)
 node bin/cartwalk.js check https://your-store.example
@@ -46,6 +46,12 @@ node bin/cartwalk.js loop http://localhost:4180 --fix-dir store --serve store/se
 
 # was the log edited?
 node bin/cartwalk.js verify --log docs/demo-run/loop.jsonl
+
+# edit a COPY of the log (a failed check becomes a pass) and watch verify catch it
+node bin/cartwalk.js tamper docs/demo-run/loop.jsonl
+
+# one-page HTML report, with a button that re-checks the hash chain in the browser
+node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html
 ```
 
 `check` exits 0 on pass, 1 on fail, 2 when the run was inconclusive. A Kane run that ends stuck is retried once and never recorded as a store failure.
@@ -69,6 +75,7 @@ node bin/cartwalk.js verify --log docs/demo-run/loop.jsonl
 | `lib/rules.js` | the deciding code |
 | `lib/fix.js` | hands failures to the coding agent and records its diff |
 | `lib/log.js` | the hash-chained log |
+| `lib/report.js` | the one-page HTML report and its in-browser verifier |
 | `store/` | the broken demo store the agent repairs |
 | `docs/kane-findings.md` | measured notes on what Kane does well and badly |
 
