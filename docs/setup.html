@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Set up Cartwalk: any machine, any store</title>
+<meta name="description" content="Install Kane CLI and Cartwalk, walk a store with one command, read the result, and optionally let a coding agent fix what fails."><meta name="theme-color" content="#0b0d10">
+<meta property="og:title" content="Set up Cartwalk: any machine, any store"><meta property="og:description" content="Install Kane CLI and Cartwalk, walk a store with one command, read the result, and optionally let a coding agent fix what fails.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+<header class="nav"><a class="brand" href="index.html" aria-label="Cartwalk home"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="5" fill="none" stroke="#6d6af7" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M9 7v12l3.4-3.1 2.2 5 2.3-1-2.2-5 4.6-.3z" fill="#6d6af7"/></svg><span>Cartwalk</span></a><nav class="nav-links" aria-label="Main"><a href="index.html#how">How it works</a><a href="index.html#run">A real run</a><a href="setup.html" aria-current="page">Set it up</a><a href="https://github.com/ibnweb3/cartwalk">GitHub</a></nav></header>
+<main id="main" style="padding:0;max-width:none">
+
+<section class="hero" style="padding-bottom:16px" aria-labelledby="h1">
+  <span class="label">/setup</span>
+  <h1 id="h1" style="max-width:18ch">Set up Cartwalk on any machine, for any store</h1>
+  <p class="sub">Five minutes of setup, then one command. It needs Node, Kane CLI and Chrome. It was built and tested on Windows 11; macOS and Linux should work but I have not run them.</p>
+</section>
+
+<section class="block" style="padding-top:24px">
+<ol class="steps">
+  <li><h3>Install what it needs</h3>
+    <div class="two"><div class="card"><h3 style="margin-top:0">Node.js 20 or newer</h3><p>Required. Runs Cartwalk itself.</p></div><div class="card"><h3 style="margin-top:0">Kane CLI</h3><p>Required. The shopper. You need a free TestMu AI account; log in once.</p><div class="cmd"><pre tabindex="0"><code>npm install -g @testmuai/kane-cli
+kane-cli login</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div></div><div class="card"><h3 style="margin-top:0">Google Chrome</h3><p>Required by Kane. If it is installed somewhere unusual, point Kane at it with the KANE_CLI_CHROME_PATH environment variable.</p></div><div class="card"><h3 style="margin-top:0">Claude Code CLI</h3><p>Only for the fix loop. Install it and log in so that `claude` works in a terminal. Not needed for check, report, verify or tamper.</p></div></div>
+    <p>Check Kane works: <code>kane-cli --version</code> should print a version. Kane's free tier gave me 10,000 credits; a walk costs about 25 to 50.</p>
+  </li>
+  <li><h3>Get Cartwalk</h3>
+    <p><strong>No install</strong> (downloads from GitHub the first time you run it):</p><div class="cmd"><pre tabindex="0"><code>npx github:ibnweb3/cartwalk help</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div>
+    <p><strong>Or clone it</strong>, if you want to read or change the code:</p><div class="cmd"><pre tabindex="0"><code>git clone https://github.com/ibnweb3/cartwalk
+cd cartwalk
+npm test</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div>
+    <p>In the examples below, <code>cartwalk</code> means either <code>npx github:ibnweb3/cartwalk</code> or, inside the clone, <code>node bin/cartwalk.js</code>.</p>
+  </li>
+  <li><h3>Walk your store</h3>
+    <p>Point it at any store's address, including one running on your own machine:</p><div class="cmd"><pre tabindex="0"><code>cartwalk check https://your-store.example</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div>
+    <p>A walk usually takes 3 to 7 minutes. Kane opens Chrome headless, reads the shipping banner, adds the most expensive product to the cart, opens the cart and presses Checkout. Here is real output from a walk of Saleor's public demo:</p>
+    <pre tabindex="0"><code>round 1: PASS  (9 steps, 250s, 53 credits)
+  PASS  reached_checkout: the shopper reached checkout, which asks for contact details before payment; Cartwalk does not fill those in, so payment itself was not probed
+  PASS  step_budget: 9 steps (budget 20)
+  PASS  price_math: 1 x $300.00 = $300.00
+  PASS  shipping_promise: subtotal $300.00 is over $75.00 and shipping is free</code></pre>
+  </li>
+  <li><h3>Read the result</h3>
+    <dl class="kv">
+      <dt>PASS / FAIL</dt><dd>The check was decided by plain code. A FAIL names the numbers or Kane's evidence.</dd>
+      <dt>n/a</dt><dd>The check was not triggered (for example, a cart under the free-shipping threshold).</dd>
+      <dt>???</dt><dd>Unknown: Kane did not report the value, so nothing is claimed.</dd>
+      <dt>exit code</dt><dd>0 pass · 1 a check failed · 2 inconclusive or could not run. Use it in a script or pipeline.</dd>
+      <dt>cartwalk-log.jsonl</dt><dd>Written in the folder you ran it from (change it with <code>--log file</code>). It holds the instruction, Kane's summary and values, and the verdicts.</dd>
+    </dl>
+  </li>
+  <li><h3>Make a report and check the log</h3><div class="cmd"><pre tabindex="0"><code>cartwalk report cartwalk-log.jsonl --out report.html
+cartwalk verify --log cartwalk-log.jsonl
+cartwalk tamper cartwalk-log.jsonl</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div>
+    <p><code>report</code> writes one HTML file with a button that re-checks the hash chain in the browser. <code>tamper</code> edits a copy of the log, never the original, and shows verification catching it.</p>
+  </li>
+  <li><h3>Let the coding agent fix it (optional)</h3>
+    <p>For a Node store that reads its port from the <code>PORT</code> environment variable. Commit your work first: the agent edits files in <code>--fix-dir</code> and its diff goes in the log.</p><div class="cmd"><pre tabindex="0"><code>cartwalk loop http://localhost:3000 --fix-dir ./my-store --serve ./my-store/server.js</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div>
+    <p>Cartwalk starts your store, walks it, and on a failure hands the failed checks and Kane's evidence to <code>claude</code> (read and edit tools only, no shell) inside <code>--fix-dir</code>. It restarts the store and walks again, up to 3 rounds (<code>--rounds</code>). For other stacks, use <code>check</code> and apply fixes yourself.</p>
+    <div class="callout"><strong>Try the loop on the bundled shop first.</strong> <code>node bin/cartwalk.js loop http://localhost:4180 --fix-dir store --serve store/server.js</code> from the clone reproduces the recorded run in about 10 minutes.</div>
+  </li>
+  <li><h3>Use it in a pipeline</h3>
+    <p>The exit codes are the interface: 0, 1 or 2. The runner needs Node, Kane CLI (logged in) and Chrome. I have not run Cartwalk in CI yet, so treat this as untested.</p>
+  </li>
+</ol>
+
+<div class="callout"><strong>Safety and cost.</strong> Cartwalk never pays and types nothing into checkout pages, but it does add one item to a cart on the store you point it at, so use a staging or test store when you can. Each walk spends about 25 to 50 Kane credits. The log stays on your machine and contains Kane's description of your store.</div>
+
+<span class="label" style="display:block;margin-top:40px">/options</span>
+<h2 style="display:block;font-size:1.5rem;margin:6px 0 14px;letter-spacing:-.02em">Options</h2>
+<div class="card"><dl class="kv">
+  <dt>--log &lt;file&gt;</dt><dd>Where to write the log.</dd>
+  <dt>--timeout &lt;sec&gt;</dt><dd>How long Kane gets for one walk. Default 420.</dd>
+  <dt>--steps &lt;n&gt;</dt><dd>Most steps Kane may take. Default 30.</dd>
+  <dt>--budget &lt;n&gt;</dt><dd>Step budget for the step_budget check. Default 20.</dd>
+  <dt>--rounds &lt;n&gt;</dt><dd>Most walk and fix rounds in a loop. Default 3.</dd>
+  <dt>--fix-dir, --serve</dt><dd>Loop only: the folder the agent may edit, and the Node file that starts your store.</dd>
+</dl></div>
+
+<span class="label" style="display:block;margin-top:40px">/troubleshooting</span>
+<h2 style="display:block;font-size:1.5rem;margin:6px 0 14px;letter-spacing:-.02em">When something goes wrong</h2>
+<div class="card"><dl class="kv">
+  <dt>Result is inconclusive</dt><dd>Kane did not finish. Its service can be slow: a healthy walk took between 2.5 and 4.5 minutes for me, and once it did not finish in 7. Run it again, or raise <code>--timeout</code>. A run that ran out of time is not retried and never counted as a store failure.</dd>
+  <dt>Kane CLI was not found</dt><dd>Run <code>npm install -g @testmuai/kane-cli</code>, then <code>kane-cli login</code>.</dd>
+  <dt>Chrome not found</dt><dd>Install Google Chrome, or set <code>KANE_CLI_CHROME_PATH</code> to its full path.</dd>
+  <dt>"something is already serving"</dt><dd>Another program is on that port. Stop it, or use another port.</dd>
+  <dt>FAIL on a store that works</dt><dd>Open the log and read Kane's summary. If it describes a real problem, it is real. Cartwalk does not fill in contact details, so it counts a contact-details checkout as reached, not as a failure.</dd>
+  <dt>"not a web address"</dt><dd>Use a full address starting with http:// or https://, with no spaces or shell symbols.</dd>
+</dl></div>
+
+<div class="callout" style="border-left-color:var(--accent)"><strong>Tested on:</strong> Windows 11, Node 24, Kane CLI 0.10.6, Chrome 158. Not tested on macOS or Linux.</div>
+</section>
+</main>
+<footer class="foot"><span>Apache-2.0 · Built for the KaneCLI Online Hackathon</span><span><a href="https://github.com/ibnweb3/cartwalk">Source</a> · <a href="https://github.com/ibnweb3/cartwalk#readme">README</a> · <a href="demo-run/loop.jsonl">Recorded log</a></span></footer>
+</div>
+
+<script src="assets/site.js"></script>
+</body></html>

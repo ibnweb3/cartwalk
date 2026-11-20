@@ -6,6 +6,8 @@ More people now ask an AI to do their shopping. If a popup it can't close, a but
 
 Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
+**Site and setup guide:** https://ibnweb3.github.io/cartwalk/ (a replay of the recorded run, the in-browser log verifier, and [setup for any machine and any store](https://ibnweb3.github.io/cartwalk/setup.html)).
+
 ## How it works
 
 1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It looks at what Checkout leads to. It is told to type nothing into the checkout pages and never to pay.
@@ -77,6 +79,9 @@ node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html
 | `lib/fix.js` | hands failures to the coding agent and records its diff |
 | `lib/log.js` | the hash-chained log |
 | `lib/report.js` | the one-page HTML report and its in-browser verifier |
+| `lib/theme.js` | the dark theme shared by the report and the site |
+| `scripts/build-site.js`, `scripts/site/` | build the hosted site in `docs/` from the recorded log (`npm run build:pages`; preview with `npm run preview`) |
+| `scripts/taste.js` | `npm run taste`: start the broken shop and send one real Kane shopper |
 | `lib/sha256-fallback.js` | SHA-256 for the report on pages where the browser's crypto is unavailable |
 | `test/` | unit tests, run by `npm test` |
 | `store/` | the broken demo store the agent repairs |

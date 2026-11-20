@@ -1,62 +1,68 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cartwalk report</title><link rel="icon" href="data:,"><style>
-:root{--bg:#fbfaf7;--fg:#1d2433;--muted:#5d6678;--line:#dcd8cf;--card:#fff;--pass:#176b3a;--passbg:#e3f3e9;--fail:#a3261d;--failbg:#fbe6e3;--warn:#8a5a00;--warnbg:#fbf0d6;--na:#4a5365;--nabg:#e9ebf0;--add:#e3f3e9;--del:#fbe6e3;--accent:#1d2433}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14171d;--fg:#e8eaee;--muted:#9aa3b2;--line:#2b303a;--card:#1b1f27;--pass:#6fd09a;--passbg:#16301f;--fail:#ff9d94;--failbg:#3a1b18;--warn:#f0c264;--warnbg:#38290c;--na:#aab2c0;--nabg:#262b35;--add:#16301f;--del:#3a1b18;--accent:#e8eaee}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:860px;margin:0 auto;padding:32px 16px 64px}
-h1{font-size:1.6rem;margin:0 0 4px;text-wrap:balance}
-h2{font-size:1.15rem;margin:0 0 4px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-h3{font-size:1rem;margin:16px 0 4px}
-.lede{color:var(--muted);margin:0 0 24px}
-.intro ol{padding-left:20px;margin:6px 0 12px}
-.intro li{margin:4px 0}
-code{font:13px ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
-a{color:inherit}
-.meta{color:var(--muted);margin:0 0 10px;font-variant-numeric:tabular-nums}
-.round,.chain{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 16px}
-table{width:100%;border-collapse:collapse;font-size:.95rem}
-th,td{text-align:left;vertical-align:top;padding:6px 8px;border-top:1px solid var(--line)}
-thead th{color:var(--muted);font-weight:600;border-top:0}
-tbody th{font-weight:600;white-space:nowrap}
-.tag{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.8rem;font-weight:600;white-space:nowrap}
-.tag.pass{color:var(--pass);background:var(--passbg)}
-.tag.fail{color:var(--fail);background:var(--failbg)}
-.tag.unknown,.tag.inconclusive{color:var(--warn);background:var(--warnbg)}
-.tag.na{color:var(--na);background:var(--nabg)}
-pre{margin:6px 0 0;padding:10px;border:1px solid var(--line);border-radius:8px;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--bg)}
-pre .add{background:var(--add);display:inline-block;min-width:100%}
-pre .del{background:var(--del);display:inline-block;min-width:100%}
-pre .hunk,pre .file{color:var(--muted)}
-details{margin:8px 0}
-summary{cursor:pointer;color:var(--muted)}
-.kane{margin:6px 0 0;color:var(--fg)}
-.hash{font:13px ui-monospace,Consolas,monospace;word-break:break-all}
-button{font:inherit;padding:8px 14px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);cursor:pointer;touch-action:manipulation}
-button.plain{background:transparent;color:var(--fg);border-color:var(--line)}
-button:focus-visible,summary:focus-visible,pre:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px}
-#result{margin:8px 0 0;min-height:1.5em}
-#result.good{color:var(--pass);font-weight:600}
-#result.bad{color:var(--fail);font-weight:600}
-footer{color:var(--muted);font-size:.9rem;margin-top:24px}
-</style></head>
-<body><main>
-<h1>Cartwalk report <span class="tag pass">Pass</span></h1>
-<p class="lede">An AI shopper walked <strong>http://localhost:4180</strong> to checkout. Plain code judged what it saw. 3 rounds, about 108 Kane credits.</p>
-<section class="round intro" aria-labelledby="intro-h">
-  <h2 id="intro-h">Can an AI agent buy from your store?</h2>
-  <p>Cartwalk sends a Kane CLI shopper through a store to checkout, lets plain code judge what it saw, lets a coding agent fix what failed, and keeps a log nobody can quietly edit. Below is one real run on a small shop with two planted mistakes.</p>
-  <h3>Taste it</h3>
-  <ol>
-    <li><strong>Here, now.</strong> Scroll to the log at the bottom and press <em>Change one result, then verify</em>.</li>
-    <li><strong>No Kane needed.</strong> Clone the repo and run <code>npm run offline</code>: it verifies the recorded log, tampers with a copy, and builds this report.</li>
-    <li><strong>With Kane.</strong> Run <code>npm run taste</code>: it starts the broken shop, sends a real shopper, and shows the failure it finds (usually 3 to 7 minutes).</li>
-  </ol>
-  <p><a href="https://github.com/ibnweb3/cartwalk">Source and README</a> · <a href="demo-run/loop.jsonl">The raw log of this run</a></p>
+<title>Cartwalk: can an AI agent buy from your store?</title>
+<meta name="description" content="A Kane CLI shopper walks your store to checkout, plain code judges it, a coding agent fixes what failed, and a hash-chained log keeps the receipts."><meta name="theme-color" content="#0b0d10">
+<meta property="og:title" content="Cartwalk: can an AI agent buy from your store?"><meta property="og:description" content="A Kane CLI shopper walks your store to checkout, plain code judges it, a coding agent fixes what failed, and a hash-chained log keeps the receipts.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css"></head>
+<body data-intro>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+<header class="nav"><a class="brand" href="index.html" aria-label="Cartwalk home"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="2" y="2" width="22" height="22" rx="5" fill="none" stroke="#6d6af7" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M9 7v12l3.4-3.1 2.2 5 2.3-1-2.2-5 4.6-.3z" fill="#6d6af7"/></svg><span>Cartwalk</span></a><nav class="nav-links" aria-label="Main"><a href="index.html#how">How it works</a><a href="index.html#run">A real run</a><a href="setup.html">Set it up</a><a href="https://github.com/ibnweb3/cartwalk">GitHub</a></nav></header>
+<main id="main" style="padding:0;max-width:none">
+
+<section class="hero" aria-labelledby="h1">
+  <span class="label">/hero · 1200 × auto</span>
+  <h1 id="h1">Can an AI agent buy from <span class="sel">your store?</span></h1>
+  <p class="sub">More people now ask an AI to shop for them. If a popup, a button or a banner that disagrees with the cart stops it, you lose the sale and never see an error. Cartwalk sends a Kane CLI shopper through your store to find out, lets a coding agent fix what it finds, and keeps a log nobody can quietly edit.</p>
+  <div class="cta"><a class="btn" href="setup.html">Set it up</a><a class="btn plain" href="#run">Watch the recorded run</a></div>
+  <p class="label hint">Scroll to watch a real run · Esc skips the intro</p>
 </section>
-<section class="round" aria-labelledby="r1">
+
+<section class="block" id="how" aria-labelledby="how-h">
+  <span class="label">/how-it-works</span>
+  <h2 id="how-h">Walk, judge, fix, prove</h2>
+  <p class="lede">An AI proposes, plain code decides, and every step is written to a log that cannot be edited without it showing.</p>
+  <div class="grid4">
+    <div class="card"><span class="step">01 · walk</span><h3>Kane shops your store</h3><p>In real Chrome, in plain English, with no selectors: read the shipping banner, pick the most expensive product, add one, open the cart, click Checkout. It never pays and types nothing into checkout.</p></div>
+    <div class="card"><span class="step">02 · judge</span><h3>Plain code decides</h3><p>Kane reports what it saw. Arithmetic and comparisons give each of four checks a pass or a fail. No model's opinion is involved, and a missing value is "unknown", never a quiet pass.</p></div>
+    <div class="card"><span class="step">03 · fix</span><h3>A coding agent repairs it</h3><p>Failed checks and Kane's evidence go to Claude Code, which can only read and edit your store's folder. Its diff goes in the log.</p></div>
+    <div class="card"><span class="step">04 · prove</span><h3>Kane walks again</h3><p>A fix only counts if the next walk passes. Every walk, verdict and diff is hash-chained: edit or delete one in the middle and verification names the entry.</p></div>
+  </div>
+</section>
+
+<section class="block" id="run" aria-labelledby="run-h">
+  <span class="label">/recorded-run</span>
+  <h2 id="run-h">A real run, round by round</h2>
+  <p class="lede">A small shop with two ordinary mistakes planted in it: the Desk Lamp cannot be added to the cart, and the banner promises free shipping over $50 while the code only waives it over $75. Below, the replay of what the log recorded.</p>
+  <div class="stage" id="stage" role="group" aria-label="Replay of the recorded run">
+    <p class="sr-only">Animated replay of the recorded run. Round 1 fails because the Desk Lamp cannot be added to the cart. Round 2 fails because shipping is charged on a cart over the free-shipping threshold. Round 3 passes. The same results are listed as text below.</p>
+    <div class="stage-bar"><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div><span class="label stage-title">/recorded-run · localhost:4180</span><span class="spacer"></span><button type="button" class="plain" data-replay style="padding:4px 12px;font-size:13px">Replay</button></div>
+    <div class="stage-body">
+      <div class="layers"><h4>Checks</h4>
+        <div class="layer" data-check="reached_checkout"><span>reached_checkout</span><span class="tag unknown">Unknown</span></div>
+        <div class="layer" data-check="step_budget"><span>step_budget</span><span class="tag unknown">Unknown</span></div>
+        <div class="layer" data-check="price_math"><span>price_math</span><span class="tag unknown">Unknown</span></div>
+        <div class="layer" data-check="shipping_promise"><span>shipping_promise</span><span class="tag unknown">Unknown</span></div>
+      </div>
+      <div class="canvas">
+        <span class="round-chip tag unknown">Ready</span>
+        <div class="shop">
+          <div class="shop-banner">Free shipping on orders over $50</div>
+          <div class="shop-body">
+            <div class="shop-product"><div class="shop-row"><span>Desk Lamp</span><b>$55.00</b></div><span class="shop-btn">Add to cart</span><div class="shop-err"></div></div>
+            <div class="shop-cart"><div class="shop-row"><span>Desk Lamp × 1</span><b>$55.00</b></div><div class="shop-row"><span>Subtotal</span><b>$55.00</b></div><div class="shop-row shop-ship"><span>Shipping</span><b>$4.99</b></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="feed" aria-hidden="true"></div>
+    <pre class="stage-diff" aria-hidden="true"></pre>
+  </div>
+  <p class="note">The replay is generated from <a href="demo-run/loop.jsonl">docs/demo-run/loop.jsonl</a>: the verdicts, the checks and the agent's diffs are the logged ones. The dollar amounts are from the demo shop.</p>
+  <div style="margin-top:28px"><section class="round" aria-labelledby="r1">
   <h2 id="r1">Round 1 <span class="tag fail">Fail</span></h2>
   <p class="meta">4 steps · 243 s · 25 Kane credits</p>
   <table><thead><tr><th>Result</th><th>Check</th><th>What was found</th></tr></thead><tbody><tr><td><span class="tag fail">Fail</span></td><th scope="row">reached_checkout</th><td>The store page lists the Desk Lamp, but the cart service does not recognize its lamp item code. Because the add request fails, the page never restores the Add to cart button or updates the cart.</td></tr><tr><td><span class="tag pass">Pass</span></td><th scope="row">step_budget</th><td>4 steps (budget 20)</td></tr><tr><td><span class="tag unknown">Unknown</span></td><th scope="row">price_math</th><td>price or subtotal was not reported</td></tr><tr><td><span class="tag unknown">Unknown</span></td><th scope="row">shipping_promise</th><td>subtotal or shipping line was not reported</td></tr></tbody></table>
@@ -110,17 +116,54 @@ I left the free-shipping mismatch alone: the banner says $50 but the code only g
   <table><thead><tr><th>Result</th><th>Check</th><th>What was found</th></tr></thead><tbody><tr><td><span class="tag pass">Pass</span></td><th scope="row">reached_checkout</th><td>the shopper reached the payment page</td></tr><tr><td><span class="tag pass">Pass</span></td><th scope="row">step_budget</th><td>5 steps (budget 20)</td></tr><tr><td><span class="tag pass">Pass</span></td><th scope="row">price_math</th><td>1 x $55.00 = $55.00</td></tr><tr><td><span class="tag pass">Pass</span></td><th scope="row">shipping_promise</th><td>subtotal $55.00 is over $50.00 and shipping is free</td></tr></tbody></table>
   
   
-</section>
-<section class="chain" aria-labelledby="chain-h">
+</section><section class="chain" aria-labelledby="chain-h">
   <h2 id="chain-h">The log</h2>
   <p>Every walk, verdict and fix is an entry that carries the hash of the one before it. Editing or deleting anything in the middle breaks the chain. 12 entries; the command-line check says: <strong>intact</strong>.</p>
   <p class="hash">head 88a1343493e658e5958344a1df523d25d5b09f854c49a0f3b814df396c125119</p>
   <div class="row"><button id="verify" type="button">Verify in this browser</button><button id="tamper" type="button" class="plain">Change one result, then verify</button></div>
   <p id="result" role="status" aria-live="polite"></p>
   <p class="meta">Entries cut off the end cannot be detected from the file alone. Publish the head hash elsewhere to cover that.</p>
+</section></div>
 </section>
-<footer>Generated by Cartwalk from the log below. Nothing on this page is typed in by hand.</footer>
+
+<section class="block" id="checks" aria-labelledby="checks-h">
+  <span class="label">/the-deciding-code</span>
+  <h2 id="checks-h">What the code decides</h2>
+  <p class="lede">These four checks live in <a href="https://github.com/ibnweb3/cartwalk/blob/main/lib/rules.js">lib/rules.js</a>, with unit tests. A value Kane did not report is "unknown", and unknown never counts as a pass.</p>
+  <div class="checks"><div class="tbl scroll-x"><table><thead><tr><th>Check</th><th>The question</th><th>How it is decided</th></tr></thead><tbody>
+  <tr><th scope="row">reached_checkout</th><td>Did the shopper get from the product page to checkout?</td><td style="color:var(--muted)">Passes when Kane finishes and reports the payment page, or a contact-details step first (Cartwalk fills in no personal details, so it says payment was not probed). Fails with Kane&#39;s evidence if it cannot add to the cart or lands somewhere else. Unknown if the run did not finish.</td></tr><tr><th scope="row">step_budget</th><td>Did it take a sane number of steps?</td><td style="color:var(--muted)">Counts the clicks, typing and page loads Kane performed. Fails over the budget (20 by default, --budget to change).</td></tr><tr><th scope="row">price_math</th><td>Does the cart add up?</td><td style="color:var(--muted)">One unit was added, so the item price must equal the subtotal. Unknown if either was not reported.</td></tr><tr><th scope="row">shipping_promise</th><td>Does the store keep its free-shipping promise?</td><td style="color:var(--muted)">Reads the threshold from the banner (&quot;over $50&quot;). If the subtotal is at or over it, shipping must be free. Not triggered below it; unknown if no threshold can be read.</td></tr>
+  </tbody></table></div></div>
+</section>
+
+<section class="block" id="taste" aria-labelledby="taste-h">
+  <span class="label">/taste-it</span>
+  <h2 id="taste-h">Three ways to try it</h2>
+  <p class="lede">From a minute in the browser to a real walk of your own store.</p>
+  <div class="grid3">
+    <div class="card"><span class="step">1 minute · browser</span><h3>Look</h3><p>Scroll up to the log and press <em>Change one result, then verify</em>. The page re-computes the hash chain itself and names the entry you changed.</p></div>
+    <div class="card"><span class="step">2 minutes · Node only</span><h3>Check the claims</h3><p>No Kane, no network. It verifies the recorded log, tampers with a copy and builds a report.</p><div class="cmd"><pre tabindex="0"><code>git clone https://github.com/ibnweb3/cartwalk
+cd cartwalk
+npm run offline</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div></div>
+    <div class="card"><span class="step">3 to 7 minutes · Kane</span><h3>Watch it catch a bug</h3><p>Starts the broken shop and sends a real shopper. About 25 to 50 Kane credits.</p><div class="cmd"><pre tabindex="0"><code>npm run taste</code></pre><button type="button" class="copy" aria-label="Copy command">Copy</button></div><p style="margin-top:8px"><a href="setup.html">Full setup, for any store</a></p></div>
+  </div>
+</section>
+
+<section class="block" id="limits" aria-labelledby="limits-h">
+  <span class="label">/limits</span>
+  <h2 id="limits-h">What it does not do</h2>
+  <div class="card"><ul style="margin:0">
+    <li>It has been run on one third-party store (Saleor's public demo) once, plus the bundled shop. One walk is not a benchmark.</li>
+    <li>Many real stores ask for contact details before payment. Cartwalk types nothing into checkout, so it says checkout was reached and that payment was not probed.</li>
+    <li>It tests one flow: the most expensive product, one unit, to checkout. No coupons, logins or real payment.</li>
+    <li>The coding agent has no shell, so it cannot run your store. Kane's next walk is the only proof a fix worked.</li>
+    <li>Kane's speed varies: walks took 2.5 to 4.5 minutes, and one test run ended inconclusive when Kane's service was slow. The recorded logs are the fallback.</li>
+    <li>The log catches edits and deletions in the middle. It cannot see entries cut off the end; publish the head hash elsewhere to cover that.</li>
+  </ul></div>
+</section>
+<script>window.CARTWALK_RUN={"entries":12,"rounds":[{"n":1,"verdict":"fail","checks":[{"id":"reached_checkout","status":"fail"},{"id":"step_budget","status":"pass"},{"id":"price_math","status":"unknown"},{"id":"shipping_promise","status":"unknown"}],"firstFail":"The store page lists the Desk Lamp, but the cart service does not recognize its lamp item code.","fixSummary":"I changed the /api/cart handler in server.js to check lookup(data.slug) instead of PRODUCTS[data.slug].","diff":"file: server.js\n@@ -91,7 +91,10 @@ function productPage(slug, count) {\n         body: JSON.stringify({slug:${JSON.stringify(slug)}, color:color})});\n       if (!r.ok) throw new Error(\"add failed\");\n       location.href = \"/cart\";\n-    } catch (e) { /* swallowed: the button stays in \"Adding...\" forever */ }\n+    } catch (e) {\n+      b.disabled = false; b.textContent = \"Add to cart\";\n+      document.getElementById(\"status\").textContent = \"Sorry, we couldn't add this to your cart. Please try again.\";"},{"n":2,"verdict":"fail","checks":[{"id":"reached_checkout","status":"pass"},{"id":"step_budget","status":"pass"},{"id":"price_math","status":"pass"},{"id":"shipping_promise","status":"fail"}],"firstFail":"banner promises free shipping over $50.00, but a $55.00 cart is charged $4.99 shipping","fixSummary":"I changed the free-shipping threshold in server.js from a hard-coded 7500 cents ($75) to FREE_SHIPPING_BANNER_DOLLARS * 100 (5000 cents, or $50).","diff":"file: server.js\n@@ -18,7 +18,7 @@ const PRODUCTS = {\n const LAMP = { name: \"Desk Lamp\", price: 5500 };\n \n const FREE_SHIPPING_BANNER_DOLLARS = 50;\n-const FREE_SHIPPING_OVER_CENTS = 7500;\n+const FREE_SHIPPING_OVER_CENTS = FREE_SHIPPING_BANNER_DOLLARS * 100;\n const SHIPPING_CENTS = 499;\n "},{"n":3,"verdict":"pass","checks":[{"id":"reached_checkout","status":"pass"},{"id":"step_budget","status":"pass"},{"id":"price_math","status":"pass"},{"id":"shipping_promise","status":"pass"}],"firstFail":"","fixSummary":"","diff":""}]};</script>
 </main>
+<footer class="foot"><span>Apache-2.0 · Built for the KaneCLI Online Hackathon</span><span><a href="https://github.com/ibnweb3/cartwalk">Source</a> · <a href="https://github.com/ibnweb3/cartwalk#readme">README</a> · <a href="demo-run/loop.jsonl">Recorded log</a></span></footer>
+</div>
 <script type="application/json" id="log-data">[{"seq":1,"ts":"2026-11-20T19:04:45.667Z","kind":"walk_start","data":{"round":1,"url":"http://localhost:4180","objective":"You are a shopper who wants to buy one item. Read the free-shipping promise in the banner at the top of the page and remember it as shipping_promise. Choose the most expensive product, select an option if one is required, and add exactly one to the cart. Open the cart. Remember the item price shown in the cart as item_price, the subtotal as cart_subtotal and the shipping line as shipping_line. Click Checkout. Look at the page it leads to and remember checkout_stage as payment if it asks for card or payment details, contact if it asks for contact, address or shipping details first, or other if it is neither. Do not type into any field on the checkout pages and never pay."},"prev":"0000000000000000000000000000000000000000000000000000000000000000","hash":"50d92561e8d645ddf9bac5aadcb96af64e6536031ee58b7467ff24117db09828"},{"seq":2,"ts":"2026-11-20T19:09:27.596Z","kind":"kane_run","data":{"round":1,"attempt":1,"status":"failed","reasonCode":"assertion_error.confirmed_product_bug","summary":"The store page lists the Desk Lamp, but the cart service does not recognize its lamp item code. Because the add request fails, the page never restores the Add to cart button or updates the cart.\nFix the cart service's product/SKU mapping for the Desk Lamp and restore the button to an actionable state with a clear error when an add request fails.\nevidence: http_error_response: POST http://localhost:4180/api/cart -> 500 body: {\"error\":\"unknown sku lamp\"}\nevidence: console_error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)","values":{"shipping_promise":"Free shipping on orders over $50","item_price":"","cart_subtotal":"","shipping_line":"","checkout_stage":""},"stepCount":4,"credits":24.94431,"durationSec":243.3,"testUrl":"https://test-manager.lambdatest.com/projects/01M7VZG2EVYQJAPK4M5N8YDASJ/test-cases/01M7X5Q0DWR6G9FM8NTA5Z8FHS/dashboard/share/US_84MUFXE4CT2V420HTABYFJL1P1KY9KG7UX2EOS7GNJA1F9DEOPA57TI4KJSXWQIX?type=summary&agentView=true&fqdn=summary-page"},"prev":"50d92561e8d645ddf9bac5aadcb96af64e6536031ee58b7467ff24117db09828","hash":"0e186b9e81061cd9e4ad072054fa3c3a9836543e8f9f0efe26c59e5c742003f8"},{"seq":3,"ts":"2026-11-20T19:09:27.600Z","kind":"verdict","data":{"round":1,"verdict":"fail","checks":[{"id":"reached_checkout","status":"fail","detail":"The store page lists the Desk Lamp, but the cart service does not recognize its lamp item code. Because the add request fails, the page never restores the Add to cart button or updates the cart.\nFix the cart service's product/SKU mapping for the Desk Lamp and restore the button to an actionable state with a clear error when an add request fails.\nevidence: http_error_response: POST http://localhost:4180/api/cart -> 500 body: {\"error\":\"unknown sku lamp\"}\nevidence: console_error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)"},{"id":"step_budget","status":"pass","detail":"4 steps (budget 20)"},{"id":"price_math","status":"unknown","detail":"price or subtotal was not reported"},{"id":"shipping_promise","status":"unknown","detail":"subtotal or shipping line was not reported"}]},"prev":"0e186b9e81061cd9e4ad072054fa3c3a9836543e8f9f0efe26c59e5c742003f8","hash":"87175f292b447ac5fc7ab198b1b000edb79e609f639150922c3bc22caed16caf"},{"seq":4,"ts":"2026-11-20T19:09:45.995Z","kind":"fix_proposed","data":{"round":1,"summary":"I changed the `/api/cart` handler in `server.js` to check `lookup(data.slug)` instead of `PRODUCTS[data.slug]`. `lookup` already knows the `lamp` item code, so adding the Desk Lamp no longer returns the 500 \"unknown sku lamp\" error. I also made the page's add-to-cart failure handler restore the \"Add to cart\" button and show a clear error message, so the button no longer stays stuck on \"Adding...\". I haven't run the server or re-run the shopper's checks.\n\nI left the free-shipping mismatch alone: the banner says $50 but the code only gives free shipping over $75. It wasn't one of the failed checks.","diffSha256":"97008b14170b4c2ccfad38630b9bc2e213bdd05e76a29818331cc934ef4526be","diff":"file: server.js\n@@ -91,7 +91,10 @@ function productPage(slug, count) {\n         body: JSON.stringify({slug:${JSON.stringify(slug)}, color:color})});\n       if (!r.ok) throw new Error(\"add failed\");\n       location.href = \"/cart\";\n-    } catch (e) { /* swallowed: the button stays in \"Adding...\" forever */ }\n+    } catch (e) {\n+      b.disabled = false; b.textContent = \"Add to cart\";\n+      document.getElementById(\"status\").textContent = \"Sorry, we couldn't add this to your cart. Please try again.\";\n+    }\n   };\n \u003c/script>`, count);\n }\n@@ -149,7 +152,7 @@ const server = http.createServer((req, res) => {\n     req.on(\"end\", () => {\n       let data = {};\n       try { data = JSON.parse(body); } catch {}\n-      if (!PRODUCTS[data.slug]) {\n+      if (!lookup(data.slug)) {\n         res.writeHead(500, { \"content-type\": \"application/json\" });\n         return res.end(JSON.stringify({ error: \"unknown sku \" + data.slug }));\n       }\n","agentExit":0},"prev":"87175f292b447ac5fc7ab198b1b000edb79e609f639150922c3bc22caed16caf","hash":"90ffff52072dbab6f663a2d88bdf1409df5f89bec1cf8e4f138aac3724cf178c"},{"seq":5,"ts":"2026-11-20T19:09:46.233Z","kind":"walk_start","data":{"round":2,"url":"http://localhost:4180","objective":"You are a shopper who wants to buy one item. Read the free-shipping promise in the banner at the top of the page and remember it as shipping_promise. Choose the most expensive product, select an option if one is required, and add exactly one to the cart. Open the cart. Remember the item price shown in the cart as item_price, the subtotal as cart_subtotal and the shipping line as shipping_line. Click Checkout. Look at the page it leads to and remember checkout_stage as payment if it asks for card or payment details, contact if it asks for contact, address or shipping details first, or other if it is neither. Do not type into any field on the checkout pages and never pay."},"prev":"90ffff52072dbab6f663a2d88bdf1409df5f89bec1cf8e4f138aac3724cf178c","hash":"ba9ffcc17af5ee2c35e7d48797976574fee277488af04d70b4210df23f2b3042"},{"seq":6,"ts":"2026-11-20T19:13:18.062Z","kind":"kane_run","data":{"round":2,"attempt":1,"status":"passed","reasonCode":"success.complete","summary":"You asked to add exactly one of the most expensive products to the cart, open the cart, and proceed to checkout without entering any checkout information or paying.\nAdded one Desk Lamp to the cart and opened the cart; its listed price and subtotal were both $55.00.\nThe cart showed a $4.99 shipping charge. The store banner stated, “Free shipping on orders over $50.”\nOpened checkout, which is at the payment-details stage. No checkout fields were completed and no payment was made.","values":{"product":"Desk Lamp","quantity":"1","item_price":"$55.00","cart_subtotal":"$55.00","shipping_line":"$4.99","shipping_promise":"Free shipping on orders over $50","checkout_stage":"payment","option_required_check":"false","checkout_payment_details_check":"true","checkout_contact_address_shipping_details_check":"false"},"stepCount":5,"credits":45.441605,"durationSec":171.1,"testUrl":"https://test-manager.lambdatest.com/projects/01M7VZG2EVYQJAPK4M5N8YDASJ/test-cases/01M7X605HSB0BERJP419MY7AAQ/dashboard/share/US_DBFZTF519JUIT8FULHO0QK8AWMAJ7P3JH7UAF6C36JKSI7M62MQEVC9CK5G8RUCM?type=summary&agentView=true&fqdn=summary-page"},"prev":"ba9ffcc17af5ee2c35e7d48797976574fee277488af04d70b4210df23f2b3042","hash":"578e78f06e5f9adf632fe71a86fc1b3e89ed7802ad5979423375d4a9c11a250b"},{"seq":7,"ts":"2026-11-20T19:13:18.065Z","kind":"verdict","data":{"round":2,"verdict":"fail","checks":[{"id":"reached_checkout","status":"pass","detail":"the shopper reached the payment page"},{"id":"step_budget","status":"pass","detail":"5 steps (budget 20)"},{"id":"price_math","status":"pass","detail":"1 x $55.00 = $55.00"},{"id":"shipping_promise","status":"fail","detail":"banner promises free shipping over $50.00, but a $55.00 cart is charged $4.99 shipping"}]},"prev":"578e78f06e5f9adf632fe71a86fc1b3e89ed7802ad5979423375d4a9c11a250b","hash":"875a7c534cced7539ed9718710f8fd35854892ec3c8fb19505bfe6747f8cab35"},{"seq":8,"ts":"2026-11-20T19:13:32.208Z","kind":"fix_proposed","data":{"round":2,"summary":"I changed the free-shipping threshold in `server.js` from a hard-coded 7500 cents ($75) to `FREE_SHIPPING_BANNER_DOLLARS * 100` (5000 cents, or $50). The banner and the shipping check now use the same value, so a $55.00 cart ships free. I haven't run the server or the shopper's checks to confirm.","diffSha256":"fbf9154d3e387c4a773d73a054b2b0e22aa11094f7c3909d0cea836b3a92cb8c","diff":"file: server.js\n@@ -18,7 +18,7 @@ const PRODUCTS = {\n const LAMP = { name: \"Desk Lamp\", price: 5500 };\n \n const FREE_SHIPPING_BANNER_DOLLARS = 50;\n-const FREE_SHIPPING_OVER_CENTS = 7500;\n+const FREE_SHIPPING_OVER_CENTS = FREE_SHIPPING_BANNER_DOLLARS * 100;\n const SHIPPING_CENTS = 499;\n \n const carts = new Map(); // session id -> [{ slug, qty }]\n","agentExit":0},"prev":"875a7c534cced7539ed9718710f8fd35854892ec3c8fb19505bfe6747f8cab35","hash":"3fff3d229b80e3c02e11d01ed142b708b8c1741ef09650f2a697882833606095"},{"seq":9,"ts":"2026-11-20T19:13:32.441Z","kind":"walk_start","data":{"round":3,"url":"http://localhost:4180","objective":"You are a shopper who wants to buy one item. Read the free-shipping promise in the banner at the top of the page and remember it as shipping_promise. Choose the most expensive product, select an option if one is required, and add exactly one to the cart. Open the cart. Remember the item price shown in the cart as item_price, the subtotal as cart_subtotal and the shipping line as shipping_line. Click Checkout. Look at the page it leads to and remember checkout_stage as payment if it asks for card or payment details, contact if it asks for contact, address or shipping details first, or other if it is neither. Do not type into any field on the checkout pages and never pay."},"prev":"3fff3d229b80e3c02e11d01ed142b708b8c1741ef09650f2a697882833606095","hash":"0c7e4308086ebfce2345dca6715f4163ecb781d333a1b481338793547e86f00d"},{"seq":10,"ts":"2026-11-20T19:16:36.236Z","kind":"kane_run","data":{"round":3,"attempt":1,"status":"passed","reasonCode":"success.complete","summary":"Read the top-banner promise: “Free shipping on orders over $50.”\nSelected the most expensive product, a Desk Lamp, and added exactly one to the cart.\nRecorded the cart details: item price $55.00, subtotal $55.00, and shipping Free.\nOpened checkout without entering any information or making a payment; the page is asking for card/payment details.","values":{"shipping_promise":"Free shipping on orders over $50","item_price":"$55.00","cart_subtotal":"$55.00","shipping_line":"Free","checkout_stage":"payment","checkout_payment_details_check":"true","checkout_contact_address_shipping_details_check":"false","checkout_other_stage_check":"false"},"stepCount":5,"credits":37.785602499999996,"durationSec":147.8,"testUrl":"https://test-manager.lambdatest.com/projects/01M7VZG2EVYQJAPK4M5N8YDASJ/test-cases/01M7X6737DV8Y4W6RTTR6T9EYB/dashboard/share/US_VB2IY01VV96UZJ0KWIAKHJ3DILSECNGE5V3DU9E23V1QH5S9XKBBWP571LBSCNQ1?type=summary&agentView=true&fqdn=summary-page"},"prev":"0c7e4308086ebfce2345dca6715f4163ecb781d333a1b481338793547e86f00d","hash":"896a96ee4e91800cc866622ab5df8c94a40f5498cc7cd18284d1c2d7b5f5d017"},{"seq":11,"ts":"2026-11-20T19:16:36.239Z","kind":"verdict","data":{"round":3,"verdict":"pass","checks":[{"id":"reached_checkout","status":"pass","detail":"the shopper reached the payment page"},{"id":"step_budget","status":"pass","detail":"5 steps (budget 20)"},{"id":"price_math","status":"pass","detail":"1 x $55.00 = $55.00"},{"id":"shipping_promise","status":"pass","detail":"subtotal $55.00 is over $50.00 and shipping is free"}]},"prev":"896a96ee4e91800cc866622ab5df8c94a40f5498cc7cd18284d1c2d7b5f5d017","hash":"6d2f54f2569a5a7cd97d8a36f1e79ba8be24538dde70a451c81d655de7b975e5"},{"seq":12,"ts":"2026-11-20T19:16:36.242Z","kind":"final","data":{"verdict":"pass"},"prev":"6d2f54f2569a5a7cd97d8a36f1e79ba8be24538dde70a451c81d655de7b975e5","hash":"88a1343493e658e5958344a1df523d25d5b09f854c49a0f3b814df396c125119"}]</script>
 <script>function sha256hex(str) {
   var bytes = new TextEncoder().encode(str);
@@ -205,4 +248,5 @@ I left the free-shipping mismatch alone: the banner says $50 but the code only g
   });
 })();
 </script>
+<script src="assets/site.js"></script>
 </body></html>

@@ -4,6 +4,6 @@
   "private": true,
   "description": "Send a Kane shopper to a store, let plain code judge what it saw, let a coding agent fix it.",
   "bin": { "cartwalk": "bin/cartwalk.js" },
-  "scripts": { "taste": "node scripts/taste.js", "offline": "node bin/cartwalk.js verify --log docs/demo-run/loop.jsonl && node bin/cartwalk.js tamper docs/demo-run/loop.jsonl && node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html", "build:pages": "node bin/cartwalk.js report docs/demo-run/loop.jsonl --out docs/index.html --intro-repo https://github.com/ibnweb3/cartwalk --intro-log demo-run/loop.jsonl", "test": "node --test test/log.test.js test/rules.test.js test/fix.test.js test/report.test.js test/sha256.test.js test/kane.test.js" },
+  "scripts": { "taste": "node scripts/taste.js", "offline": "node bin/cartwalk.js verify --log docs/demo-run/loop.jsonl && node bin/cartwalk.js tamper docs/demo-run/loop.jsonl && node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html", "build:pages": "node scripts/build-site.js", "preview": "node scripts/serve-docs.js", "test": "node --test test/log.test.js test/rules.test.js test/fix.test.js test/report.test.js test/sha256.test.js test/site.test.js test/kane.test.js" },
   "license": "Apache-2.0"
 }
