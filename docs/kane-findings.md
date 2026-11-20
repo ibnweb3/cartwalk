@@ -1,5 +1,7 @@
 # What we measured about Kane CLI (2026-11-20)
 
+> History note: these measurements were taken on 2026-11-20 while the project was still an earlier idea, a "done gate" named Notyet that blocked a coding agent from finishing until Kane passed. We moved to Cartwalk (the shopper walk in `bin/`, `lib/` and `store/`) after these runs. `demo-shop/` and `checks/` are the test bed for the numbers below and are kept as the record, not as part of Cartwalk. The Cartwalk-era findings (value extraction works; hung runs ignore `--timeout`) are in the README.
+
 All runs: Kane CLI 0.10.6, Windows 11, headless, against `demo-shop/` on localhost.
 Browser: Playwright Chromium (Google Chrome is not installed here; Brave gave the same results).
 
