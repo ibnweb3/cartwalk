@@ -8,9 +8,9 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
 ## How it works
 
-1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It looks at what Checkout leads to, types nothing into the checkout pages, and never pays.
+1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It looks at what Checkout leads to. It is told to type nothing into the checkout pages and never to pay.
 2. **Plain code judges.** Kane reports what it saw (banner text, item price, subtotal, shipping line). `lib/rules.js` decides with arithmetic and comparisons, never with a model's opinion: did it reach checkout, in how many steps, does price x quantity equal the subtotal, does the store keep its free-shipping promise.
-3. **A coding agent fixes it.** Failed checks and Kane's evidence go to Claude Code, which may edit only the store's folder. Its diff is logged.
+3. **A coding agent fixes it.** Failed checks and Kane's evidence go to Claude Code, started inside the store's folder with read and edit tools only (no shell). Its diff is logged.
 4. **Kane walks again.** The agent's fix only counts if the next walk passes.
 5. **Every step is in a hash-chained log.** `cartwalk verify` tells you if anything in the middle was edited or removed.
 
@@ -24,11 +24,11 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 | 2 | FAIL | The cart works, but the banner promises free shipping over $50 and a $55 cart is charged $4.99. The agent ties the threshold to the banner's number. |
 | 3 | PASS | Reached the payment page, the arithmetic matches, shipping is free. |
 
-Each walk took 2-3 minutes and 29-41 Kane credits.
+Each walk took 2-3 minutes and 29-41 Kane credits. This run used an earlier wording of the shopper's instruction that did not yet report `checkout_stage`, so the log shows the payment page as `payment_details_page_visible`; the current rules would call that check inconclusive. The log is a hash-chained record and was left as it was.
 
 ## On a store I did not build
 
-Saleor's public demo, one walk, `docs/third-party/saleor-demo.jsonl`: PASS in 4 minutes and 53 credits. Kane read the banner ("Free shipping on orders over $75.00"), picked a $300.00 item, and the cart showed $300.00 with free shipping. Checkout asked for contact details first, so the result says payment was not probed. Two earlier attempts taught me something: the first ran out of time at my 180-second limit and was correctly reported as inconclusive, and the second failed "reached payment" only because Cartwalk does not fill in contact details. That was Cartwalk's limit, not a bug in Saleor, so I changed the rule instead of letting the agent "fix" a working store.
+Saleor's public demo, one walk, `docs/third-party/saleor-demo.jsonl`: PASS in 4 minutes and 53 credits. Kane read the banner ("Free shipping on orders over $75.00"), picked a $300.00 item, and the cart showed $300.00 with free shipping. Checkout asked for contact details first, so the result says payment was not probed. Cartwalk does not fill in contact details, so a rule that demanded the payment page would blame a working store for that limit. An earlier walk, `docs/third-party/saleor-demo-attempt-2.jsonl`, shows it: Kane read the same price, subtotal and free shipping correctly, but the old rule failed "reached payment" at the contact-details step. The rule now counts that step as reached (`lib/rules.js`, covered in `test/rules.test.js`), so the coding agent is not sent to "fix" a working store. A first attempt ran out of time and was reported inconclusive; its log was not kept.
 
 ## Try it
 
@@ -38,10 +38,11 @@ You need Node 20+, [Kane CLI](https://github.com/LambdaTest/kane-cli) logged in 
 git clone https://github.com/ibnweb3/cartwalk && cd cartwalk
 npm test                                   # unit tests, no network
 
-# walk and judge any store (never pays)
+# walk and judge any store (spends Kane credits; never pays)
 node bin/cartwalk.js check https://your-store.example
 
-# walk, fix, walk again on the bundled broken store (about 10 minutes)
+# walk, fix, walk again on the bundled broken store
+# (spends Kane credits and several minutes; the recorded run took three walks)
 node bin/cartwalk.js loop http://localhost:4180 --fix-dir store --serve store/server.js
 
 # was the log edited?
@@ -54,13 +55,13 @@ node bin/cartwalk.js tamper docs/demo-run/loop.jsonl
 node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html
 ```
 
-`check` exits 0 on pass, 1 on fail, 2 when the run was inconclusive. A Kane run that ends stuck is retried once and never recorded as a store failure.
+`check` and `loop` exit 0 on pass, 1 on fail, 2 when the run was inconclusive or could not start. `verify` exits 0 when the chain is intact and 1 when it is broken. A Kane run that ends stuck is retried once and never recorded as a store failure.
 
 ## What it does not do
 
-- It has been run on one store I did not build that works: Saleor's public demo (below). Another public demo (Medusa's) failed before the cart, with add-to-cart returning 500 in two of two runs; that may be a problem with that demo backend, not Medusa's code.
+- It has been run on one store I did not build: Saleor's public demo (above), once. One walk is not a benchmark.
 - Many real stores ask for contact details before payment. Cartwalk types nothing into checkout, so there it reports that checkout was reached and says payment itself was not probed.
-- The coding agent could not run the store itself in either recorded run. Kane's next walk is the only proof a fix worked.
+- The coding agent has no shell, so it cannot run the store itself. Kane's next walk is the only proof a fix worked.
 - It tests one flow (most expensive product, one unit, to checkout). It does not test coupons, logins, guest versus account checkout, or real payment.
 - The log catches edits and deletions in the middle. It cannot catch entries cut off the end; publish the `head` hash somewhere else to cover that.
 - Kane's runs can be slow or end stuck, and `--timeout` is not always honoured while a page request hangs, so Cartwalk enforces its own hard limit.
@@ -69,15 +70,19 @@ node bin/cartwalk.js report docs/demo-run/loop.jsonl --out report.html
 
 | Path | What it is |
 |---|---|
-| `bin/cartwalk.js` | the CLI: `check`, `loop`, `verify` |
+| `bin/cartwalk.js` | the CLI: `check`, `loop`, `verify`, `report`, `tamper` |
 | `lib/kane.js` | runs Kane and parses its NDJSON stream |
 | `lib/shopper.js` | the one plain-English instruction every store gets |
 | `lib/rules.js` | the deciding code |
 | `lib/fix.js` | hands failures to the coding agent and records its diff |
 | `lib/log.js` | the hash-chained log |
 | `lib/report.js` | the one-page HTML report and its in-browser verifier |
+| `lib/sha256-fallback.js` | SHA-256 for the report on pages where the browser's crypto is unavailable |
+| `test/` | unit tests, run by `npm test` |
 | `store/` | the broken demo store the agent repairs |
-| `docs/kane-findings.md` | measured notes on what Kane does well and badly |
+| `docs/demo-run/`, `docs/third-party/` | the two recorded logs above (do not edit; `verify` would fail) |
+| `docs/kane-findings.md` | measured notes on Kane from an earlier experiment |
+| `demo-shop/`, `checks/` | that earlier experiment's test bed, kept as the record; not part of Cartwalk |
 
 ## License
 

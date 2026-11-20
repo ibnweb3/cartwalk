@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { spawn } = require("child_process");
-const { runKane } = require("../lib/kane");
+const { runKane, checkStoreUrl } = require("../lib/kane");
 const { SHOPPER_OBJECTIVE } = require("../lib/shopper");
 const { evaluate } = require("../lib/rules");
 const { proposeFix } = require("../lib/fix");
@@ -18,6 +18,9 @@ cartwalk verify [--log <file>]   check that a log has not been edited
 cartwalk report <log> [--out <file.html>]
                                  write a one-page HTML report with an in-browser verifier
 cartwalk tamper <log>            edit a COPY of the log (a failed check becomes a pass) and show verify catch it
+cartwalk help                    show this text
+
+exit codes for check and loop: 0 pass, 1 fail, 2 inconclusive or could not run
 
 options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 180>
          --steps <max Kane steps, default 25>  --rounds <n, default 3>`;
@@ -25,7 +28,12 @@ options: --log <file>  --budget <steps, default 20>  --timeout <sec, default 180
 function parseArgs(argv) {
   const pos = [], opt = {};
   for (let i = 0; i < argv.length; i++) {
-    if (argv[i].startsWith("--")) opt[argv[i].slice(2)] = argv[++i];
+    if (argv[i].startsWith("--")) {
+      const name = argv[i].slice(2);
+      if (name === "help") { opt.help = true; continue; }
+      if (i + 1 >= argv.length || argv[i + 1].startsWith("--")) throw new Error(`--${name} needs a value`);
+      opt[name] = argv[++i];
+    }
     else pos.push(argv[i]);
   }
   return { pos, opt };
@@ -73,6 +81,7 @@ function startServer(file, url) {
 }
 
 async function check(url, o) {
+  checkStoreUrl(url);
   const logFile = o.log || "cartwalk-log.jsonl";
   const { verdict } = await walk(url, o, logFile, 1);
   const v = log.verify(logFile);
@@ -82,6 +91,8 @@ async function check(url, o) {
 
 async function loop(url, o) {
   if (!o["fix-dir"] || !o.serve) { console.error("loop needs --fix-dir and --serve\n\n" + USAGE); return 2; }
+  checkStoreUrl(url);
+  if (!fs.existsSync(o["fix-dir"]) || !fs.existsSync(o.serve)) { console.error("--fix-dir and --serve must point to existing paths"); return 2; }
   if (await waitFor(url, 600)) { console.error(`something is already serving ${url}; stop it first so cartwalk can restart the store after each fix`); return 2; }
   const logFile = o.log || path.join("runs", `loop-${ts()}.jsonl`);
   const rounds = Number(o.rounds || 3);
@@ -114,6 +125,7 @@ async function loop(url, o) {
 
 function verifyCmd(o) {
   const file = o.log || "cartwalk-log.jsonl";
+  if (!fs.existsSync(file)) { console.error(`no such log: ${file}\nname one with --log <file>`); return 2; }
   const v = log.verify(file);
   if (v.ok) { console.log(`ok: ${v.count} entries, chain intact\nhead: ${v.head}`); return 0; }
   console.log(`BROKEN: ${v.reason}`);
@@ -146,10 +158,12 @@ function tamperCmd(file) {
 }
 
 (async () => {
-  const { pos, opt } = parseArgs(process.argv.slice(2));
+  let pos, opt;
+  try { ({ pos, opt } = parseArgs(process.argv.slice(2))); } catch (err) { console.error("cartwalk: " + err.message); process.exitCode = 2; return; }
   const cmd = pos[0];
   try {
-    if (cmd === "check" && pos[1]) process.exitCode = await check(pos[1], opt);
+    if (opt.help || cmd === "help") { console.log(USAGE); process.exitCode = 0; }
+    else if (cmd === "check" && pos[1]) process.exitCode = await check(pos[1], opt);
     else if (cmd === "loop" && pos[1]) process.exitCode = await loop(pos[1], opt);
     else if (cmd === "verify") process.exitCode = verifyCmd(opt);
     else if (cmd === "report" && pos[1]) process.exitCode = reportCmd(pos[1], opt);
