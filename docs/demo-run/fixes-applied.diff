@@ -1,15 +1,9 @@
 diff --git a/store/server.js b/store/server.js
-index 55c6fad..9f659f9 100644
+index 55c6fad..209a628 100644
 --- a/store/server.js
 +++ b/store/server.js
-@@ -13,12 +13,11 @@ const PORT = Number(process.env.PORT || 4180);
- 
- const PRODUCTS = {
-   notebook: { name: "Notebook (A5)", price: 1200 },
--  // The lamp is missing here on purpose, so adding it to the cart fails.
-+  lamp: { name: "Desk Lamp", price: 5500 },
- };
--const LAMP = { name: "Desk Lamp", price: 5500 };
+@@ -18,7 +18,7 @@ const PRODUCTS = {
+ const LAMP = { name: "Desk Lamp", price: 5500 };
  
  const FREE_SHIPPING_BANNER_DOLLARS = 50;
 -const FREE_SHIPPING_OVER_CENTS = 7500;
@@ -17,11 +11,24 @@ index 55c6fad..9f659f9 100644
  const SHIPPING_CENTS = 499;
  
  const carts = new Map(); // session id -> [{ slug, qty }]
-@@ -27,7 +26,6 @@ const money = (c) => "$" + (c / 100).toFixed(2);
- const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
- 
- function lookup(slug) {
--  if (slug === "lamp") return LAMP;
-   return PRODUCTS[slug];
+@@ -91,7 +91,10 @@ function productPage(slug, count) {
+         body: JSON.stringify({slug:${JSON.stringify(slug)}, color:color})});
+       if (!r.ok) throw new Error("add failed");
+       location.href = "/cart";
+-    } catch (e) { /* swallowed: the button stays in "Adding..." forever */ }
++    } catch (e) {
++      b.disabled = false; b.textContent = "Add to cart";
++      document.getElementById("status").textContent = "Sorry, we couldn't add this to your cart. Please try again.";
++    }
+   };
+ </script>`, count);
  }
- 
+@@ -149,7 +152,7 @@ const server = http.createServer((req, res) => {
+     req.on("end", () => {
+       let data = {};
+       try { data = JSON.parse(body); } catch {}
+-      if (!PRODUCTS[data.slug]) {
++      if (!lookup(data.slug)) {
+         res.writeHead(500, { "content-type": "application/json" });
+         return res.end(JSON.stringify({ error: "unknown sku " + data.slug }));
+       }

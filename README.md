@@ -20,11 +20,11 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
 | Round | Result | What happened |
 |---|---|---|
-| 1 | FAIL | The Desk Lamp cannot be added to the cart (`POST /api/cart` returns 500, the button stays on "Adding..."). The agent adds the lamp to the product table. |
+| 1 | FAIL | The Desk Lamp cannot be added to the cart (`POST /api/cart` returns 500, the button stays on "Adding..."). The agent makes the cart look the lamp up the same way the product page does. |
 | 2 | FAIL | The cart works, but the banner promises free shipping over $50 and a $55 cart is charged $4.99. The agent ties the threshold to the banner's number. |
 | 3 | PASS | Reached the payment page, the arithmetic matches, shipping is free. |
 
-Each walk took 2-3 minutes and 29-41 Kane credits. This run used an earlier wording of the shopper's instruction that did not yet report `checkout_stage`, so the log shows the payment page as `payment_details_page_visible`; the current rules would call that check inconclusive. The log is a hash-chained record and was left as it was.
+Each walk took 2.5 to 4 minutes and 25 to 45 Kane credits; the whole run was about 10 minutes. This is the run made with the current rules and shopper instruction. The agent's fixes differ a little between runs, so the log and the diff go together.
 
 ## On a store I did not build
 
