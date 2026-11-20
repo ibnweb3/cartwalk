@@ -33,6 +33,14 @@ test("deleting a middle entry is detected", () => {
   assert.equal(v.ok, false); assert.equal(v.brokenAt, 3);
 });
 
+test("a field that is undefined when written still verifies when read back", () => {
+  const f = tmp();
+  append(f, "kane_run", { status: "errored", credits: undefined, testUrl: undefined, values: {} });
+  append(f, "verdict", { checks: [{ id: "x", detail: undefined }] });
+  const v = verify(f);
+  assert.equal(v.ok, true); assert.equal(v.count, 2);
+});
+
 test("key order does not change the hash", () => {
   const a = tmp(), b = tmp();
   const x = append(a, "k", { p: 1, q: 2 }, "t");
