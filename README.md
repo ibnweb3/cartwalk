@@ -8,6 +8,8 @@ Built for the KaneCLI Online Hackathon (12-26 Nov 2026).
 
 **Site and setup guide:** https://ibnweb3.github.io/cartwalk/ (a replay of the recorded run, the in-browser log verifier, and [setup for any machine and any store](https://ibnweb3.github.io/cartwalk/setup.html)).
 
+**Demo video (2:21):** https://youtu.be/B42H6Kr8POM
+
 ## How it works
 
 1. **Kane walks the store.** [Kane CLI](https://github.com/LambdaTest/kane-cli) acts as the shopper in a real Chrome. In plain English, with no selectors, it reads the shipping promise, picks the most expensive product, adds one to the cart, opens the cart, and clicks Checkout. It looks at what Checkout leads to. It is told to type nothing into the checkout pages and never to pay.

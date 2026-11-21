@@ -12,6 +12,8 @@ Cartwalk tests a store the way an AI shopping agent would use it. A Kane CLI sho
 
 **Outside stores.** The same instruction, unchanged, walked two public demos I did not build, once each. Saleor passed (it asks for contact details before payment, so payment itself was not probed). On Medusa's public demo, Kane confirmed a 500 on add to cart (this may be that demo's backend, not Medusa's code). Two walks are not a benchmark.
 
+**Demo video.** https://youtu.be/B42H6Kr8POM
+
 **Try it.** `npx github:ibnweb3/cartwalk help`, or `npm run taste` to run one real Kane walk on the included demo shop. Setup guide and recorded run: https://ibnweb3.github.io/cartwalk/
 
 **Fallback if Kane is slow or unavailable.** The recorded runs are in the repo and on the site: docs/demo-run/loop.jsonl (the full red-to-green loop), docs/third-party/ (Saleor and Medusa logs and reports), and the 2:21 demo video. Kane walks take 2.5 to 4.6 minutes and vary with the store.
