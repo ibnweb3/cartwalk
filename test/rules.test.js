@@ -137,12 +137,18 @@ test("quantity one with a higher subtotal still fails, with the numbers", () => 
   assert.match(c.detail, /\$20\.00.*\$22\.00/);
 });
 
-test("a product-page price that differs from the cart line is unknown (variant pricing), never a fail", () => {
-  const higher = pm({ item_price: "$60.00", cart_subtotal: "$60.00", page_price: "$50.00" });
-  const lower = pm({ item_price: "$45.00", cart_subtotal: "$45.00", page_price: "$50.00" });
-  assert.equal(higher.status, "unknown");
-  assert.equal(lower.status, "unknown");
-  assert.match(higher.detail, /variant price or a discount/);
+test("a product-page price that differs from the cart line is a note, not a verdict change (sale or variant price)", () => {
+  const sale = pm({ item_price: "$300.00", cart_subtotal: "$300.00", page_price: "$500.00", item_quantity: "1", discount_line: "none" });
+  assert.equal(sale.status, "pass");
+  assert.ok(sale.detail.includes("note: the product page showed $500.00 and the cart line is $300.00"), sale.detail);
+  const r = evaluate({ ...ok, values: { checkout_stage: "contact", shipping_promise: "none", shipping_line: "Free", item_price: "$300.00", cart_subtotal: "$300.00", page_price: "$500.00", item_quantity: "1", discount_line: "none" } });
+  assert.equal(r.verdict, "pass");
+});
+
+test("the page-price note is attached to a real failure too, and never hides it", () => {
+  const c = pm({ item_price: "$60.00", cart_subtotal: "$66.00", page_price: "$50.00", item_quantity: "1" });
+  assert.equal(c.status, "fail");
+  assert.match(c.detail, /note: the product page showed/);
 });
 
 test("a matching page price, quantity and no discount passes as before", () => {
