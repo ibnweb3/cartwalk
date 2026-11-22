@@ -94,3 +94,63 @@ test("a store with no free-shipping promise has nothing to check", () => {
   assert.equal(c.status, "na");
   assert.equal(r.verdict, "pass");
 });
+
+// ---- price_math: quantity, discounts and the product-page price ----
+const pm = (values) => evaluate({ ...ok, values: { checkout_stage: "payment", shipping_promise: "none", shipping_line: "Free", ...values } }).checks.find((x) => x.id === "price_math");
+
+test("a discount shown as its own line reconciles instead of failing a correct store", () => {
+  const c = pm({ item_price: "$60.00", cart_subtotal: "$54.00", discount_line: "-$6.00 (SAVE10)" });
+  assert.equal(c.status, "pass");
+  assert.match(c.detail, /1 x \$60\.00 - \$6\.00 discount = \$54\.00/);
+});
+
+test("a subtotal lower than the price with no discount reported is unknown, never sent to the agent", () => {
+  const c = pm({ item_price: "$60.00", cart_subtotal: "$54.00", discount_line: "none" });
+  assert.equal(c.status, "unknown");
+  assert.match(c.detail, /needs a human/);
+});
+
+test("a discount that does not explain the gap is unknown", () => {
+  const c = pm({ item_price: "$60.00", cart_subtotal: "$40.00", discount_line: "-$6.00" });
+  assert.equal(c.status, "unknown");
+  assert.match(c.detail, /does not explain/);
+});
+
+test("a discount line whose amount cannot be read is unknown", () => {
+  const c = pm({ item_price: "$60.00", cart_subtotal: "$54.00", discount_line: "Welcome offer applied" });
+  assert.equal(c.status, "unknown");
+});
+
+test("a reported quantity of two is multiplied in", () => {
+  assert.equal(pm({ item_price: "$20.00", cart_subtotal: "$40.00", item_quantity: "2" }).status, "pass");
+});
+
+test("a minimum order quantity that was not reported is unknown, not a fail", () => {
+  const c = pm({ item_price: "$20.00", cart_subtotal: "$40.00" });
+  assert.equal(c.status, "unknown");
+  assert.match(c.detail, /quantity was not reported/);
+});
+
+test("quantity one with a higher subtotal still fails, with the numbers", () => {
+  const c = pm({ item_price: "$20.00", cart_subtotal: "$22.00", item_quantity: "1" });
+  assert.equal(c.status, "fail");
+  assert.match(c.detail, /\$20\.00.*\$22\.00/);
+});
+
+test("a product-page price that differs from the cart line is unknown (variant pricing), never a fail", () => {
+  const higher = pm({ item_price: "$60.00", cart_subtotal: "$60.00", page_price: "$50.00" });
+  const lower = pm({ item_price: "$45.00", cart_subtotal: "$45.00", page_price: "$50.00" });
+  assert.equal(higher.status, "unknown");
+  assert.equal(lower.status, "unknown");
+  assert.match(higher.detail, /variant price or a discount/);
+});
+
+test("a matching page price, quantity and no discount passes as before", () => {
+  const c = pm({ item_price: "$55.00", cart_subtotal: "$55.00", page_price: "$55.00", item_quantity: "1", discount_line: "none" });
+  assert.equal(c.status, "pass");
+});
+
+test("old runs without the new fields still evaluate exactly as before", () => {
+  assert.equal(pm({ item_price: "$55.00", cart_subtotal: "$55.00" }).status, "pass");
+  assert.equal(evaluate({ ...ok, values: {} }).verdict, "inconclusive");
+});

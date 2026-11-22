@@ -75,7 +75,7 @@ ${extraBody}
 const checksRows = [
   ["reached_checkout", "Did the shopper get from the product page to checkout?", "Passes when Kane finishes and reports the payment page, or a contact-details step first (Cartwalk fills in no personal details, so it says payment was not probed). Fails, with Kane's evidence, only when Kane confirms a product bug such as a failed add to cart, or when Checkout leads somewhere else. If Kane cannot follow the instruction (for example the store has no banner to read) the result is unknown, never a store failure."],
   ["step_budget", "Did it take a sane number of steps?", "Counts the clicks, typing and page loads Kane performed. Fails over the budget (20 by default, --budget to change)."],
-  ["price_math", "Does the cart add up?", "One unit was added, so the item price must equal the subtotal. Unknown if either was not reported."],
+  ["price_math", "Does the cart add up?", "Item price x quantity, minus any discount line, must equal the subtotal. Fails only when the store charges more than that. A discount that does not reconcile, a lower subtotal, an unreported quantity or a product-page price that differs from the cart line is unknown and goes to a human, not to the agent."],
   ["shipping_promise", "Does the store keep its free-shipping promise?", "Reads the threshold from the banner (\"over $50\"). If the subtotal is at or over it, shipping must be free. Not triggered below it; unknown if no threshold can be read."],
 ];
 
