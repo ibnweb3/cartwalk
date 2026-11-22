@@ -206,7 +206,7 @@ const setupBody = `
   <li><h3>Walk your store</h3>
     <p>Point it at any store's address, including one running on your own machine:</p>${cmd("cartwalk check https://your-store.example")}
     <p>A walk usually takes 3 to 7 minutes. Kane opens Chrome headless, reads the shipping banner, adds the most expensive product to the cart, opens the cart and presses Checkout. Here is real output from a walk of Saleor's public demo:</p>
-    <pre tabindex="0"><code>round 1: PASS  (9 steps, 250s, 53 credits)
+    <pre tabindex="0"><code>round 1: PASS  (9 steps, 314s, 84 credits)
   PASS  reached_checkout: the shopper reached checkout, which asks for contact details before payment; Cartwalk does not fill those in, so payment itself was not probed
   PASS  step_budget: 9 steps (budget 20)
   PASS  price_math: 1 x $300.00 = $300.00
